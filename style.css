@@ -2,11 +2,9 @@ body {
     margin: 0;
     background-image: url('images/background.jpeg');
     overflow-x: hidden;
-    overflow-y: hidden;
 }
 
 #contentContainer {
-    width: 40%;
     margin: auto;
     text-align: center;
 }
@@ -45,6 +43,28 @@ canvas {
     outline: none;
 }
 
-.mainMenuBtn:hover, #headerContainer:hover {
+.mainMenuBtn:hover,
+#headerContainer:hover {
     cursor: pointer;
+}
+
+sup {
+    vertical-align: super;
+    font-size: smaller;
+}
+
+h4, h5{
+    margin: 0;
+}
+
+.starInfo {
+    font-size: 25px;
+    padding: 10px;
+    margin: auto;
+    width: 575px;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.8);
+    color: #cecece;
+    outline: none;
 }

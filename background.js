@@ -63,7 +63,7 @@ setInterval(() => {
     currentImg += (currentImg == 7) ? -7 : 1;
     let planet = new Planet(images[currentImg].pos, images[currentImg].sizeX, images[currentImg].sizeY, images[currentImg].name);
     planets.push(planet);
-}, 2700);
+}, 4000);
 planets.push(new Planet(images[0].pos, images[0].sizeX, images[0].sizeY, images[0].name));
 
 const drawCanvas = () => {
@@ -71,12 +71,12 @@ const drawCanvas = () => {
     for (let i = 0; i < planets.length; i++) {
         let img = new Image;
         img.src = `/images/${planets[i].name}.png.png`;
-        if (planets[i].sizeY > 450) planets.splice(i, 1);
+        if (planets[i].sizeY > 700) planets.splice(i, 1);
         else {
             planets[i].sizeX += 0.5;
             planets[i].sizeY += 0.5;
-            if (Math.sign(planets[i].pos) == 1) planets[i].pos += 0.3;
-            else planets[i].pos -= 0.7;
+            if (Math.sign(planets[i].pos) == 1) planets[i].pos += 0.4;
+            else planets[i].pos -= 0.85;
         }
         ctx.drawImage(img, canvas.width / 2 + planets[i].pos, canvas.height / 2 - 400, planets[i].sizeX, planets[i].sizeY);
     }
