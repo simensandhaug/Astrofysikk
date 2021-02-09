@@ -1,6 +1,7 @@
 body {
     margin: 0;
     background-image: url('images/background.jpeg');
+    background-size: cover;
     overflow-x: hidden;
 }
 
@@ -36,6 +37,7 @@ canvas {
     padding: 20px;
     width: 500px;
     margin: auto;
+    margin-top: 20px;
     text-align: center;
     box-shadow: 0px 0px 8px 7px #888888;
     background-color: rgba(51, 47, 47, 0.8);
@@ -53,18 +55,24 @@ sup {
     font-size: smaller;
 }
 
-h4, h5{
+h5{
+    font-size: 25px;
     margin: 0;
 }
 
 .starInfo {
-    font-size: 25px;
     padding: 10px;
     margin: auto;
-    width: 575px;
+    margin-top: 5px;
+    width: 480px;
     text-align: center;
     box-shadow: 0px 0px 8px 7px #888888;
     background-color: rgba(51, 47, 47, 0.8);
     color: #cecece;
     outline: none;
+}
+
+#starImages {
+    margin: auto;
+    text-align: center;
 }
