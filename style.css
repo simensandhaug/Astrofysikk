@@ -1,0 +1,50 @@
+body {
+    margin: 0;
+    background-image: url('images/background.jpeg');
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#contentContainer {
+    width: 40%;
+    margin: auto;
+    text-align: center;
+}
+
+#headerContainer {
+    width: 500px;
+    margin: auto;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.8);
+    margin-top: 5%;
+    color: #cecece;
+}
+
+#panningContainer {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+}
+
+canvas {
+    position: absolute;
+    width: 100%;
+    z-index: 0;
+}
+
+.mainMenuBtn {
+    font-size: 25px;
+    padding: 20px;
+    width: 500px;
+    margin: auto;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.8);
+    color: #cecece;
+    outline: none;
+}
+
+.mainMenuBtn:hover, #headerContainer:hover {
+    cursor: pointer;
+}
