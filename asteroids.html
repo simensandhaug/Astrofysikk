@@ -12,12 +12,19 @@
     <div id="contentContainer">
         <div id="headerContainer" onclick="location.href='index.html'">
             <h1>Astrofysikk</h1>
-            Et lite minigame for moro
+            <p>Trykk for å gå tilbake</p>
+            <p>Et lite minigame for moro</p>
             <h3>Simen</h3>
         </div>
-        <canvas id="asteroidsCanvas" width="680px" height="680px">
+        <p id="time"></p>
+        <canvas id="asteroidsCanvas" width="660px" height="660px">
 
         </canvas>
+        <div id="asteroidsEndScreen">
+            <h1>Game Over</h1>
+            <p id="endTime"></p>
+            <button id="asteroidsEndButton">Start New Game</button>
+        </div>
     </div>
 </body>
 </html>

@@ -7,3 +7,31 @@ body {
     margin: auto;
     box-shadow: 0px 0px 8px 7px #888888;
 }
+
+#time {
+    font-size: 20px;
+    color: #cecece;
+}
+
+#asteroidsEndScreen {
+    position: absolute;
+    background-color: rgba(201, 201, 201, 0.8);
+    width: 660px;
+    height: 660px;
+    right: 50%;
+    top: 310px;
+    left: 630px;
+}
+
+#asteroidsEndButton {
+    font-size: 25px;
+    padding: 20px;
+    width: 200px;
+    margin: auto;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.3);
+    color: #cecece;
+    outline: none;
+}
