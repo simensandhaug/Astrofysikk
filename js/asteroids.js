@@ -1,3 +1,6 @@
+//////////////////////////
+///// HTML ELEMENTS /////
+////////////////////////
 const canvas = document.getElementById("asteroidsCanvas");
 const ctx = canvas.getContext("2d");
 const timeEl = document.getElementById("time");
@@ -5,17 +8,24 @@ const endScreenEl = document.getElementById("asteroidsEndScreen");
 const endTimeEl = document.getElementById("endTime");
 const endButton = document.getElementById("asteroidsEndButton");
 
-let asteroids = new Array; //Array med alle asteroidene på skjermen og som trengs å oppdateres
 
-let asteroidInterval = 3000; //ms
 
-//Intervals
+//////////////////////
+///// INTERVALS /////
+////////////////////
 let update;
 let createAsteroids;
 let asteroidSpawnSpeed;
 let gameTime;
-let time;
 
+
+
+//////////////////////
+///// VARIABLES /////
+////////////////////
+let time;
+let asteroids = new Array; //Array med alle asteroidene på skjermen og som trengs å oppdateres
+let asteroidInterval = 3000; //ms
 let spaceship = { //Alle variabler som omhandler spaceshippet
     xPos: canvas.width / 2,
     yPos: canvas.height / 2,
@@ -28,6 +38,11 @@ let spaceship = { //Alle variabler som omhandler spaceshippet
     right: false,
 }
 
+
+
+////////////////////
+///// CLASSES /////
+//////////////////
 class Asteroid { //Sier seg selv
     constructor(size, dx, dy, x, y) { //Størrelse, endring i x, endring i y, x posisjon, y posisjon
         this.size = size;
@@ -38,6 +53,11 @@ class Asteroid { //Sier seg selv
     }
 }
 
+
+
+//////////////////////
+///// FUNCTIONS /////
+////////////////////
 const drawPolygon = (centerX, centerY, size, rotationDegrees, sides, fillcolor) => { //Funksjon som tegner polygoner med respekt til rotasjon av objektet
     var radians = rotationDegrees * Math.PI / 180;
     ctx.translate(centerX, centerY);
@@ -54,36 +74,7 @@ const drawPolygon = (centerX, centerY, size, rotationDegrees, sides, fillcolor) 
     ctx.rotate(-radians);
     ctx.translate(-centerX, -centerY);
 }
-
-document.addEventListener("keydown", (e) => { //Sjekker for keydown
-    switch (e.key) {
-        case "ArrowUp":
-            spaceship.up = true;
-            break;
-        case "ArrowLeft":
-            spaceship.left = true;
-            break;
-        case "ArrowRight":
-            spaceship.right = true;
-            break;
-    }
-});
-
-document.addEventListener("keyup", (e) => { //Sjekker for keyup
-    switch (e.key) {
-        case "ArrowUp":
-            spaceship.up = false;
-            break;
-        case "ArrowLeft":
-            spaceship.left = false;
-            break;
-        case "ArrowRight":
-            spaceship.right = false;
-            break;
-    }
-});
-
-const gameOver = time => {
+const gameOver = time => { //Når spillet er over
     endScreenEl.style.visibility = "visible";
     endTimeEl.innerHTML = `Du overlevde i: ${time} seconds`;
     clearInterval(update);
@@ -106,8 +97,7 @@ const gameOver = time => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPolygon(spaceship.xPos, spaceship.yPos, spaceship.size, spaceship.rotation);
 }
-
-const startGame = () => {
+const startGame = () => { //Starter spillet
     endScreenEl.style.visibility = "hidden";
     time = 0;
     update = setInterval(() => { //Updatefunksjonen som runner hele spillet
@@ -166,6 +156,42 @@ const startGame = () => {
     drawPolygon(spaceship.xPos, spaceship.yPos, spaceship.size, spaceship.rotation); //Tegner spaceshippet i starten
 }
 
-endButton.addEventListener("click", startGame);
 
+
+////////////////////////////
+///// EVENT LISTENERS /////
+//////////////////////////
+endButton.addEventListener("click", startGame);
+document.addEventListener("keydown", (e) => { //Sjekker for keydown
+    switch (e.key) {
+        case "ArrowUp":
+            spaceship.up = true;
+            break;
+        case "ArrowLeft":
+            spaceship.left = true;
+            break;
+        case "ArrowRight":
+            spaceship.right = true;
+            break;
+    }
+});
+document.addEventListener("keyup", (e) => { //Sjekker for keyup
+    switch (e.key) {
+        case "ArrowUp":
+            spaceship.up = false;
+            break;
+        case "ArrowLeft":
+            spaceship.left = false;
+            break;
+        case "ArrowRight":
+            spaceship.right = false;
+            break;
+    }
+});
+
+
+
+////////////////////////////
+///// INITIALIZE GAME /////
+//////////////////////////
 startGame();
