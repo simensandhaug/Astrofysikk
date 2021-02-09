@@ -1,0 +1,9 @@
+body {
+    overflow-y: hidden;
+}
+
+#asteroidsCanvas {
+    background-color: rgba(51, 47, 47, 0.8);
+    margin: auto;
+    box-shadow: 0px 0px 8px 7px #888888;
+}
