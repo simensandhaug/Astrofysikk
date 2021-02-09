@@ -50,6 +50,21 @@ class Asteroid { //Sier seg selv
         this.dy = dy;
         this.xPos = x;
         this.yPos = y;
+        this.numberOfVertices = 5;
+    }
+
+    draw() {
+        this.vertices = [];
+        for (var i = 1; i <= this.numberOfVertices; i += 1) this.vertices.push([this.xPos + this.size * Math.cos(i * 2 * Math.PI / this.numberOfVertices), this.yPos + this.size * Math.sin(i * 2 * Math.PI / this.numberOfVertices)]);
+        ctx.beginPath();
+        ctx.moveTo(this.vertices[0][0], this.vertices[0][1]);
+        for(let i = 0; i<this.vertices.length - 1; i++) ctx.lineTo(this.vertices[i+1][0], this.vertices[i+1][1]);
+        ctx.lineTo(this.vertices[0][0], this.vertices[0][1]);
+        ctx.strokeStyle = 'white';
+        ctx.fillStyle = 'grey';
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
     }
 }
 
@@ -76,6 +91,7 @@ const drawPolygon = (centerX, centerY, size, rotationDegrees, sides, fillcolor) 
     ctx.rotate(-radians);
     ctx.translate(-centerX, -centerY);
 }
+
 const gameOver = time => { //Når spillet er over
     endScreenEl.style.visibility = "visible";
     endTimeEl.innerHTML = `Du overlevde i: ${time} sekunder`;
@@ -99,8 +115,8 @@ const startGame = () => { //Starter spillet
         directionY: Math.sin(toRadians(270)),
         dx: 0,
         dy: 0,
-        aX: 0,
-        aY: 0,
+        aX: 0.5,
+        aY: 0.5,
         up: false,
         left: false,
         right: false,
@@ -113,8 +129,8 @@ const startGame = () => { //Starter spillet
         //Clearer canvas og begynner å drawe
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (spaceship.left) spaceship.rotation += -2; //Roterer 2 grader venstre
-        if (spaceship.right) spaceship.rotation += 2; //Roterer 2 grader høyre
+        if (spaceship.left) spaceship.rotation += -3; //Roterer 2 grader venstre
+        if (spaceship.right) spaceship.rotation += 3; //Roterer 2 grader høyre
 
         //Sørger for at gradene alltid er mellom 0-360
         if (spaceship.rotation > 360) spaceship.rotation = 0;
@@ -125,34 +141,37 @@ const startGame = () => { //Starter spillet
         spaceship.directionY = Math.sin(toRadians(spaceship.rotation));
 
         if (spaceship.up) {
-            spaceship.aX = spaceship.directionX * 0.1;
-            spaceship.aY = spaceship.directionY * 0.1;
-        } 
-        // else {
-        //     spaceship.aX = spaceship.directionX * -0.03;
-        //     spaceship.aY = spaceship.directionY * -0.03;
-        // }
+            spaceship.aX = spaceship.directionX * 0.4;
+            spaceship.aY = spaceship.directionY * 0.4;
+        }
+        else {
+            spaceship.dx *= 0.98;
+            spaceship.dy *= 0.98;
+            spaceship.aY = 0;
+            spaceship.aX = 0;
+        }
 
         let magnitude = Math.sqrt(Math.pow(spaceship.dx, 2) + Math.pow(spaceship.dy, 2));
-        if (magnitude > 10) {
-            magnitude = 10;
+        if (magnitude > 5) {
+            magnitude = 5;
             let angle = Math.atan2(spaceship.dy, spaceship.dx);
             spaceship.dx = Math.cos(angle) * magnitude;
             spaceship.dy = Math.sin(angle) * magnitude;
-        } else {
-            spaceship.dx += spaceship.aY;
-            spaceship.dy += spaceship.aY;
-        }
+        } 
+
+        //Oppdaterer fart
+        spaceship.dx += spaceship.aX;
+        spaceship.dy += spaceship.aY;
 
         //Oppdaterer posisjonen til spaceshipet
         spaceship.xPos += spaceship.dx;
         spaceship.yPos += spaceship.dy;
 
         //Sjekker om spaceshippet er utenfor canvas og setter den til riktig sted
-        if (spaceship.xPos < 0) spaceship.xPos = canvas.width;
-        if (spaceship.xPos > canvas.width) spaceship.xPos = 0;
-        if (spaceship.yPos < 0) spaceship.yPos = canvas.height;
-        if (spaceship.ypos > canvas.height) spaceship.yPos = 0;
+        if (spaceship.xPos < 0) spaceship.xPos = canvas.width - spaceship.size;
+        if (spaceship.xPos + spaceship.size > canvas.width) spaceship.xPos = 0;
+        if (spaceship.yPos < 0) spaceship.yPos = canvas.height - spaceship.size;
+        if (spaceship.yPos + spaceship.size > canvas.height) spaceship.yPos = 0;
 
         asteroids.forEach((asteroid, i) => { //Oppdaterer og tegner de individuelle asteroidene
             asteroid.xPos += asteroid.dx;
@@ -164,7 +183,7 @@ const startGame = () => { //Starter spillet
             //Fjerner asteroiden dersom den er utafor canvas
             if (asteroid.xPos < 0 || asteroid.xPos > canvas.width || asteroid.yPos < 0 || asteroid.ypos > canvas.height) asteroids.splice(i, 1);
 
-            drawPolygon(asteroid.xPos, asteroid.yPos, asteroid.size, 0, 5, 'grey'); //Tegner asteroidene
+            asteroid.draw() //Tegner asteroidene
         });
         drawPolygon(spaceship.xPos, spaceship.yPos, spaceship.size, spaceship.rotation, 3, 'white'); //Tegner spaceshippet
     }, 20);
