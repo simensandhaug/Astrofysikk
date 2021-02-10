@@ -116,7 +116,7 @@ const startGame = () => { //Starter spillet
             ctx.moveTo(spaceship.size * Math.cos(0), spaceship.size * Math.sin(0));
             for (let i = 1; i <= 3; i++) ctx.lineTo(spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges));
             ctx.closePath();
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'red';
             ctx.strokeStyle = "grey";
             ctx.lineWidth = 2;
             ctx.stroke();

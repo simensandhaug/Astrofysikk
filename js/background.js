@@ -1,53 +1,76 @@
 const canvas = document.getElementById("panCanvas");
 const ctx = canvas.getContext("2d");
+let interval = 3000;
 const images = [{
         name: 'mercury',
         pos: -150,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'venus',
         pos: 110,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'earth',
         pos: -150,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
+    },
+    {
+        name: 'hubble',
+        pos: -150,
+        sizeX: 20,
+        sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'mars',
         pos: 110,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
+    },
+    {
+        name: 'roadster',
+        pos: 110,
+        sizeX: 20,
+        sizeY: 20,
+        timing: 500,
     },
     {
         name: 'jupiter',
         pos: -150,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'saturn',
         pos: 110,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'uranus',
         pos: -150,
         sizeX: 20,
         sizeY: 20,
+        timing: 4000,
     },
     {
         name: 'neptune',
         pos: 110,
         sizeX: 20,
         sizeY: 20,
-    }
+        timing: 4000,
+    },
 ];
 let currentImg = 0;
 const planets = [];
@@ -60,10 +83,11 @@ class Planet {
     }
 }
 setInterval(() => {
-    currentImg += (currentImg == 7) ? -7 : 1;
+    currentImg += (currentImg == images.length) ? -images.length : 1;
+    interval = images[currentImg].timing;
     let planet = new Planet(images[currentImg].pos, images[currentImg].sizeX, images[currentImg].sizeY, images[currentImg].name);
     planets.push(planet);
-}, 4000);
+}, interval);
 planets.push(new Planet(images[0].pos, images[0].sizeX, images[0].sizeY, images[0].name));
 
 const drawCanvas = () => {
