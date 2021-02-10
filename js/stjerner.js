@@ -7,7 +7,7 @@ let currentStar = 0;
 const content = document.getElementById("starImages");
 const stars = [{
         name: 'Betelgeuse',
-        age: '~ 7.3 x 10<sup>6</sup>',
+        age: '~7.3 ⋅ 10<sup>6</sup>',
         kelvin: '3140–3641 K',
         distance: '643 ± 146 lysår',
         img: '/images/betelgeuse.jpeg',
@@ -15,7 +15,7 @@ const stars = [{
     },
     {
         name: 'Proxima Centauri',
-        age: '~ 4.8 x 10<sup>9</sup>',
+        age: '~4.8 ⋅ 10<sup>9</sup>',
         kelvin: '3042 ± 117 K',
         distance: '4.2465 ± 0.0003 lysår',
         img: '/images/proxima-centauri.jpeg',
