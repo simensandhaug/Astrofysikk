@@ -92,6 +92,10 @@ const gameOver = time => { //Når spillet er over
     clearInterval(gameTime);
 }
 const startGame = () => { //Starter spillet
+    clearInterval(update);
+    clearInterval(createAsteroids);
+    clearInterval(asteroidSpawnSpeed);
+    clearInterval(gameTime);
     spaceship = {
         x: canvas.width / 2,
         y: canvas.height / 2,
@@ -99,6 +103,8 @@ const startGame = () => { //Starter spillet
         rotation: 270,
         dx: 0,
         dy: 0,
+        aX: 0,
+        aY: 0,
         up: false,
         left: false,
         right: false,
@@ -107,7 +113,7 @@ const startGame = () => { //Starter spillet
         draw: () => {
             spaceship.vertices = [];
             for (let i = 1; i <= 3; i++) {
-                spaceship.vertices.push([(spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges))]);
+                spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
             }
             let radians = spaceship.rotation * Math.PI / 180;
             ctx.translate(spaceship.x, spaceship.y);
@@ -187,7 +193,11 @@ const startGame = () => { //Starter spillet
             asteroid.move();
 
             //Sjekker om spaceship collider med en av asteroidene
-            if (!sat(asteroid, spaceship)) gameOver(time);
+            for (let i = 0; i < asteroid.edges - 1; i++) {
+                for (let j = 0; j < spaceship.edges - 1; j++) {
+                    if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[i + 1][0], asteroid.vertices[i + 1][1], spaceship.vertices[j][0], spaceship.vertices[j][1], spaceship.vertices[j + 1][0], spaceship.vertices[j + 1][1])) gameOver(time);
+                }
+            }
 
             //Fjerner asteroiden dersom den er utafor canvas
             if (asteroid.outsideBoundary()) asteroid.remove();
@@ -220,61 +230,17 @@ const startGame = () => { //Starter spillet
 //////////////////////////////
 //include appropriate test case code.
 //Tatt fra nettet
-const sat = (polygonA, polygonB) => {
-    var perpendicularLine = null;
-    var dot = 0;
-    var perpendicularStack = [];
-    var amin = null;
-    var amax = null;
-    var bmin = null;
-    var bmax = null;
-    for (var i = 0; i < polygonA.edges.length; i++) {
-        perpendicularLine = new xy(-polygonA.edges[i].y,
-            polygonA.edges[i].x);
-        perpendicularStack.push(perpendicularLine);
-    }
-    for (var i = 0; i < polygonB.edges.length; i++) {
-        perpendicularLine = new xy(-polygonB.edges[i].y,
-            polygonB.edges[i].x);
-        perpendicularStack.push(perpendicularLine);
-    }
-    for (var i = 0; i < perpendicularStack.length; i++) {
-        amin = null;
-        amax = null;
-        bmin = null;
-        bmax = null;
-        for (var j = 0; j < polygonA.vertices.length; j++) {
-            dot = polygonA.vertices[j].x *
-                perpenddicularStack[i].x +
-                polygonA.vertices[j].y *
-                perpendicularStack[i].y;
-            if (amax === null || dot < amin) {
-                amax = dot;
-            }
-            if (amin === null || dot < amin) {
-                amin = dot;
-            }
-        }
-        for (var j = 0; j < polygonB.vertices.length; j++) {
-            dot = polygonB.vertices[j].x *
-                perpendicularStack[i].x +
-                polygonB.vertices[j].y *
-                perpendicularStack[i].y;
-            if (bmax === null || dot > bmax) {
-                bmax = dot;
-            }
-            if (bmin === null || dot < bmin) {
-                bmin = dot;
-            }
-        }
-        if ((amin < bmax && amin > bmin) ||
-            (bmin < amax && bmin > amin)) {
-            continue;
-        } else {
-            return false;
-        }
-    }
-    return true;
+function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
+    var s1_x, s1_y, s2_x, s2_y;
+    s1_x = p1_x - p0_x;
+    s1_y = p1_y - p0_y;
+    s2_x = p3_x - p2_x;
+    s2_y = p3_y - p2_y;
+    var s, t;
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) return true; //Collision 
+    else return false;
 }
 
 
