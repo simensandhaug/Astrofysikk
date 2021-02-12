@@ -25,8 +25,15 @@ const equations = [{
         equation: `v = H ⋅ r`,
         variableMeanings: ['v = Radialfarten til galaksen', 'H = Konstant(~21.7 ± 1.0)', 'r = Avstanden fra jorda til galaksen'],
         units: ['v = m/s', 'H = (km/s) / 10<sup>6</sup> l.y', 'r = m'],
-        info: 'Galakser har en radialfart om er større jo større avstanden er fra jorda. H er Hubbles konstant og blir bestemt med stadig større nøyaktighet.',
+        info: 'Galakser har en radialfart som er større jo større avstanden er fra jorda. H er Hubbles konstant og blir bestemt med stadig større nøyaktighet.',
     },
 ];
-tbodyEL.innerHTML = `<tr><th>Navn</th><th>Formel</th><th>Variabler</th><th>Enheter</th><th>Info</th></tr>`;
-for (let i = 0; i < equations.length; i++) tbodyEL.innerHTML += `<tr><td>${equations[i].name}</td><td class="formel">${equations[i].equation}</td><td>${equations[i].variableMeanings.join('<div class="break"></div>')}</td><td>${equations[i].units.join('<div class="break"></div>')}</td><td class="info">${equations[i].info}</td></tr>`;
+tbodyEL.innerHTML = `<tr><th>Navn</th><th>Formel</th><th>Variabler</th><th>Enheter</th><th>Info</th><th>Kalkulator</th></tr>`;
+for (let i = 0; i < equations.length; i++) tbodyEL.innerHTML += `<tr><td>${equations[i].name}</td><td class="formel">${equations[i].equation}</td><td>${equations[i].variableMeanings.join('<div class="break"></div>')}</td><td>${equations[i].units.join('<div class="break"></div>')}</td><td class="info">${equations[i].info}</td><td><button class="regnut" onclick="calculate(${equations[i].name})">Regn Ut</button></td></tr>`;
+
+const calculate = name => {
+    switch(name) {
+        case 'Stefan-Boltzmanns lov':
+            console.log("hei")
+    }
+}

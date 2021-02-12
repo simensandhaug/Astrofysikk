@@ -112,9 +112,7 @@ const startGame = () => { //Starter spillet
         edges: 3,
         draw: () => {
             spaceship.vertices = [];
-            for (let i = 1; i <= 3; i++) {
-                spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
-            }
+            for (let i = 1; i <= 3; i++) spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
             let radians = spaceship.rotation * Math.PI / 180;
             ctx.translate(spaceship.x, spaceship.y);
             ctx.rotate(radians);
@@ -193,8 +191,8 @@ const startGame = () => { //Starter spillet
             asteroid.move();
 
             //Sjekker om spaceship collider med en av asteroidene
-            for (let i = 0; i < asteroid.edges - 1; i++) {
-                for (let j = 0; j < spaceship.edges - 1; j++) {
+            for (let i = 0; i < asteroid.vertices.length - 1; i++) {
+                for (let j = 0; j < spaceship.vertices.length - 1; j++) {
                     if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[i + 1][0], asteroid.vertices[i + 1][1], spaceship.vertices[j][0], spaceship.vertices[j][1], spaceship.vertices[j + 1][0], spaceship.vertices[j + 1][1])) gameOver(time);
                 }
             }
@@ -228,7 +226,6 @@ const startGame = () => { //Starter spillet
 ////////////////////////////////
 ///// COLLISION DETECTION /////
 //////////////////////////////
-//include appropriate test case code.
 //Tatt fra nettet
 function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
     var s1_x, s1_y, s2_x, s2_y;
@@ -239,8 +236,8 @@ function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
     var s, t;
     s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
     t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
-    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) return true; //Collision 
-    else return false;
+    console.log(s, t)
+    if ((s >= 0 && s <= 1) && (t >= 0 && t <= 1)) return true // Collision detected;
 }
 
 
