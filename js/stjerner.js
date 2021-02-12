@@ -19,7 +19,7 @@ const stars = [{
         kelvin: '3042 ± 117 K',
         distance: '4.2465 ± 0.0003 lysår',
         img: '/images/proxima-centauri.jpeg',
-        fact: 'Proxima Centauri er den stjernen som ligger nærmest solen. Den tilhører stjernebildet Kentauren, derav navnet Centauri. Den ligger i trippelstjernesystemet Alfa Centauri der den kretser rundt hovedstjernen Alfr Centauri med en omløpstid på ca. én million år. Den er en rød dverg, noe som betyr at den er relativt liten og "kjølig". Bildet over ble tatt av Hubble Teleskopet i 2013.'
+        fact: 'Proxima Centauri er den stjernen som ligger nærmest solen. Den tilhører stjernebildet Kentauren, derav navnet Centauri. Den ligger i trippelstjernesystemet Alfa Centauri der den kretser rundt hovedstjernen Alfa Centauri med en omløpstid på ca. én million år. Den er en rød dverg, noe som betyr at den er relativt liten og "kjølig". Bildet over ble tatt av Hubble Teleskopet i 2013.'
     },
 ];
 

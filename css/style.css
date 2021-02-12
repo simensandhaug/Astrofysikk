@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Mega&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap');
+
 body {
     margin: 0;
     background-image: url('../images/background.jpeg');
     background-size: cover;
     overflow-x: hidden;
-    font-family: 'Lexend Mega', sans-serif;
+    font-family: 'PT Sans', sans-serif;
 }
 
 #contentContainer {
@@ -20,6 +21,7 @@ body {
     background-color: rgba(51, 47, 47, 0.8);
     margin-top: 5%;
     color: #cecece;
+    font-family: 'Pathway Gothic One', sans-serif;
 }
 
 #panningContainer {
@@ -44,7 +46,7 @@ body {
     box-shadow: 0px 0px 8px 7px #888888;
     background-color: rgba(51, 47, 47, 0.8);
     color: #cecece;
-    outline: none; 
+    outline: none;
 }
 
 .mainMenuBtn:hover,
@@ -57,7 +59,7 @@ sup {
     font-size: smaller;
 }
 
-h5{
+h5 {
     font-size: 25px;
     margin: 0;
 }
@@ -77,4 +79,8 @@ h5{
 #starImages {
     margin: auto;
     text-align: center;
+}
+
+.starIMG {
+    box-shadow: 0px 0px 8px 7px #888888;
 }
