@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Astrofysikk</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/background.js" defer></script>
-    <script src="js/app.js" defer></script>
+    <link rel="stylesheet" href="css/mainmenu.css">
+    <script src="js/mainmenubackground.js" defer></script>
+
     <style>
         body {
             overflow-y: hidden;
@@ -17,25 +18,23 @@
 </head>
 
 <body>
-    <div id="contentContainer">
-        <div id="headerContainer">
-            <h1>Astrofysikk</h1>
-            <h3>Simen</h3>
+    <div class="container">
+        <div class="taskbar">
+            <div id="title"></div>
+            <img id="dropDownList" src="images/list.png" alt="Menyliste" onclick="toggleButtons()">
+            <div id="buttonMenu">
+                <button class="mainMenuBtn" onclick="location.href='stjerner.html'">
+                    Stjerner
+                </button>
+                <button class="mainMenuBtn" onclick="location.href='asteroids.html'">
+                    Asteroids Minigame
+                </button>
+                <button class="mainMenuBtn" onclick="location.href='formler.html'">
+                    Formelsamling for kapittelet
+                </button>
+            </div>
         </div>
-        <button class="mainMenuBtn" onclick="location.href='stjerner.html'">
-            Stjerner
-        </button>
-        <br>
-        <button class="mainMenuBtn" onclick="location.href='asteroids.html'">
-            Asteroids Minigame
-        </button>
-        <br>
-        <button class="mainMenuBtn" onclick="location.href='formler.html'">
-            Formelsamling for kapittelet
-        </button>
-        <br>
     </div>
-    <canvas id="panCanvas" width="1200px" height="1000px"></canvas>
 </body>
 
 </html>

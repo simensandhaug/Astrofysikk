@@ -7,18 +7,21 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/asteroids.css">
     <script src="js/asteroids.js" defer></script>
+    <script src="js/background.js" defer></script>
 </head>
 <body>
-    <div id="contentContainer">
-        <div id="headerContainer" onclick="location.href='index.html'">
-            <h1 id="scoreEl">Score: 0</h1>
-            <p>Bruk piltastene for å bevege deg og skyt med spacebar</p>
-            <p>Trykk for å gå tilbake</p>
+    <div class="container">
+        <div id="contentContainer">
+            <div id="headerContainer" onclick="location.href='index.html'">
+                <h1 id="scoreEl">Score: 0</h1>
+                <p>Bruk piltastene for å bevege deg og skyt med spacebar</p>
+                <p>Trykk for å gå tilbake</p>
+            </div>
+            <button id="asteroidsEndButton">Start New Game</button> <br>
+            <canvas id="asteroidsCanvas" width="660px" height="660px">
+    
+            </canvas>
         </div>
-        <button id="asteroidsEndButton">Start New Game</button> <br>
-        <canvas id="asteroidsCanvas" width="660px" height="660px">
-
-        </canvas>
     </div>
 </body>
 </html>

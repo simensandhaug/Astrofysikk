@@ -34,19 +34,8 @@ body {
     position: absolute;
     width: 100%;
     z-index: 0;
-}
-
-.mainMenuBtn {
-    font-size: 25px;
-    padding: 20px;
-    width: 500px;
-    margin: auto;
-    margin-top: 20px;
-    text-align: center;
-    box-shadow: 0px 0px 8px 7px #888888;
-    background-color: rgba(51, 47, 47, 0.8);
-    color: #cecece;
-    outline: none;
+    margin-top: 100px;
+    right: 0;
 }
 
 .mainMenuBtn:hover,
@@ -74,4 +63,35 @@ h5 {
     background-color: rgba(51, 47, 47, 0.8);
     color: #cecece;
     outline: none;
+}
+
+@keyframes panning {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    25% {
+        background-position: 100% 100%;
+    }
+
+    50% {
+        background-position: 100% 0%;
+    }
+
+    75% {
+        background-position: 0 100%;
+    }
+
+    200% {
+        background-position: 0 0;
+    }
+}
+
+.container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-image: url('../images/background1.jpeg');
+    background-size: 100%;
+    animation: panning 50s infinite linear;
 }
