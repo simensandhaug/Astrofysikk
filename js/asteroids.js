@@ -42,7 +42,6 @@ class Asteroid { //Sier seg selv
         this.vertices = [];
         for (let i = 1; i <= this.edges; i++) this.vertices.push([this.x + this.size * Math.cos(i * 2 * Math.PI / this.edges), this.y + this.size * Math.sin(i * 2 * Math.PI / this.edges)]);
     }
-
     draw() {
         this.vertices = [];
         for (let i = 1; i <= this.edges; i++) this.vertices.push([this.x + this.size * Math.cos(i * 2 * Math.PI / this.edges), this.y + this.size * Math.sin(i * 2 * Math.PI / this.edges)]);
@@ -56,17 +55,14 @@ class Asteroid { //Sier seg selv
         ctx.fill();
         ctx.closePath();
     }
-
     move() {
         this.x += this.dx;
         this.y += this.dy;
     }
-
     outsideBoundary() {
         if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.ypos > canvas.height) return true;
         else return false;
     }
-
     remove() {
         asteroids.splice(asteroids.indexOf(this), 1);
     }

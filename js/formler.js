@@ -1,7 +1,6 @@
 const contentContainer = document.getElementById("contentContainer");
 contentContainer.style.visibility = "visible";
 let equations = [];
-
 const showCalculator = name => {
     contentContainer.innerHTML = `<div id="headerContainer" onclick="loadPage()"><h1>Astrofysikk</h1><p>Formelkalkulator (La ukjent være tom)</p><p>Trykk for å gå tilbake</p></div>`;
     contentContainer.innerHTML += `<div id="calculatorDiv"></div>`;
@@ -16,12 +15,10 @@ const showCalculator = name => {
     calcDiv.innerHTML += `<button id="calcButton" onclick="calculate(\`${name}\`)">Calculate</button>`;
     calcDiv.innerHTML += `<p id="output"></p>`
 }
-
 const calculate = name => {
     let inputs = document.querySelectorAll(".calcInput");
     let output = document.getElementById("output");
     let outputValue;
-
     output.innerHTML = "";
     switch (name) {
         case 'Stefan-Boltzmanns lov':
@@ -59,9 +56,7 @@ const calculate = name => {
                 outputValue = `r = ${(inputs[0].value/21.7).toExponential(2).replace(/e\+?/, ' ⋅ 10^')} m`;
             }
     }
-
     let i = 0;
-
     function typeOutput() {
         if (i < outputValue.length) {
             output.innerHTML += outputValue.charAt(i);
@@ -71,7 +66,6 @@ const calculate = name => {
     }
     typeOutput();
 }
-
 const loadPage = () => {
     equations = [{
         name: 'Stefan-Boltzmanns lov',
@@ -106,5 +100,4 @@ const loadPage = () => {
     let tbodyEL = document.getElementById("tbody");
     for (let i = 0; i < equations.length; i++) tbodyEL.innerHTML += `<tr><td>${equations[i].name}</td><td class="formel">${equations[i].equation}</td><td>${equations[i].variableMeanings.join('<div class="break"></div>')}</td><td>${equations[i].units.join('<div class="break"></div>')}</td><td class="info">${equations[i].info}</td><td><button class="regnut" onclick='showCalculator(\`${equations[i].name}\`)'>Bruk Formel</button></td></tr>`;
 }
-
 loadPage();

@@ -89,7 +89,6 @@ setInterval(() => {
     planets.push(planet);
 }, interval);
 planets.push(new Planet(images[0].pos, images[0].sizeX, images[0].sizeY, images[0].name));
-
 const drawCanvas = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < planets.length; i++) {

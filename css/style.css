@@ -75,12 +75,3 @@ h5 {
     color: #cecece;
     outline: none;
 }
-
-#starImages {
-    margin: auto;
-    text-align: center;
-}
-
-.starIMG {
-    box-shadow: 0px 0px 8px 7px #888888;
-}
