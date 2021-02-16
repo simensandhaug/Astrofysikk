@@ -5,6 +5,7 @@ const canvas = document.getElementById("asteroidsCanvas");
 const ctx = canvas.getContext("2d");
 const timeEl = document.getElementById("time");
 const endButton = document.getElementById("asteroidsEndButton");
+const scoreEl = document.getElementById("scoreEl");
 
 
 
@@ -23,7 +24,7 @@ let gameTime;
 ////////////////////
 let time;
 let asteroids = new Array; //Array med alle asteroidene på skjermen og som trengs å oppdateres
-let asteroidInterval = 3000; //ms
+let asteroidInterval = 1500; //ms
 let spaceship = {} //Alle variabler som omhandler spaceshippet
 
 
@@ -31,8 +32,34 @@ let spaceship = {} //Alle variabler som omhandler spaceshippet
 ////////////////////
 ///// CLASSES /////
 //////////////////
+class Projectile {
+    constructor(dirX, dirY, x, y) {
+        this.x = x;
+        this.y = y;
+        this.vector = [dirX, dirY];
+        this.speed = 10;
+    }
+    move() {
+        this.x += this.speed * this.vector[0];
+        this.y += this.speed * this.vector[1];
+    }
+    outsideBoundary() {
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) return true;
+        else return false;
+    }
+    remove() {
+        spaceship.projectiles.splice(spaceship.projectiles.indexOf(this), 1);
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.closePath();
+    }
+}
 class Asteroid { //Sier seg selv
-    constructor(size, dx, dy, x, y) { //Størrelse, endring i x, endring i y, x posisjon, y posisjon
+    constructor(size, dx, dy, x, y, child) { //Størrelse, endring i x, endring i y, x posisjon, y posisjon
         this.size = size;
         this.dx = dx;
         this.dy = dy;
@@ -40,6 +67,8 @@ class Asteroid { //Sier seg selv
         this.y = y;
         this.edges = 5;
         this.vertices = [];
+        this.child = child;
+        this.score = this.child ? 50 : 100;
         for (let i = 1; i <= this.edges; i++) this.vertices.push([this.x + this.size * Math.cos(i * 2 * Math.PI / this.edges), this.y + this.size * Math.sin(i * 2 * Math.PI / this.edges)]);
     }
     draw() {
@@ -66,6 +95,24 @@ class Asteroid { //Sier seg selv
     remove() {
         asteroids.splice(asteroids.indexOf(this), 1);
     }
+    checkIfshot() {
+        spaceship.projectiles.forEach(projectile => {
+            if (projectile.x < this.x + this.size && projectile.x > this.x - this.size && projectile.y < this.y + this.size && projectile.y > this.y - this.size) {
+                spaceship.score += this.score;
+                scoreEl.innerHTML = `Score: ${spaceship.score}`;
+                this.split();
+                this.remove();
+                spaceship.projectiles.splice(spaceship.projectiles.indexOf(projectile), 1);
+            }
+        });
+    }
+    split() {
+        if (this.child) return;
+        let randomDx1 = Math.random() < 0.5 ? Math.floor(Math.random()) + 1 : (Math.floor(Math.random()) + 1) * -1;
+        let randomDx2 = Math.random() < 0.5 ? Math.floor(Math.random()) + 1 : (Math.floor(Math.random()) + 1) * -1;
+        asteroids.push(new Asteroid(this.size / 2, randomDx1 * 2, Math.random() * 3 * -1, this.x, this.y, true));
+        asteroids.push(new Asteroid(this.size / 2, randomDx2 * 2, Math.random() * 3, this.x, this.y, true));
+    }
 }
 
 
@@ -81,7 +128,8 @@ const gameOver = time => { //Når spillet er over
     ctx.fillStyle = 'black';
     ctx.font = '30px Arial';
     ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
-    ctx.fillText(`Score: ${time}`, canvas.width / 2 - 60, canvas.height / 2 + 30);
+    ctx.fillText(`Time: ${time}s`, canvas.width / 2 - 60, canvas.height / 2 + 30);
+    ctx.fillText(`Score: ${spaceship.score}`, canvas.width / 2 - 80, canvas.height / 2 + 60);
     clearInterval(update);
     clearInterval(createAsteroids);
     clearInterval(asteroidSpawnSpeed);
@@ -105,7 +153,9 @@ const startGame = () => { //Starter spillet
         left: false,
         right: false,
         vertices: [],
+        projectiles: [],
         edges: 3,
+        score: 0,
         draw: () => {
             spaceship.vertices = [];
             for (let i = 1; i <= 3; i++) spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
@@ -123,7 +173,8 @@ const startGame = () => { //Starter spillet
             ctx.fill();
             ctx.rotate(-radians);
             ctx.translate(-spaceship.x, -spaceship.y);
-        }
+        },
+        shoot: () => spaceship.projectiles.push(new Projectile(spaceship.directionX, spaceship.directionY, spaceship.x, spaceship.y)),
     }
 
     //Setter variabler til startverdier ved new game
@@ -182,14 +233,26 @@ const startGame = () => { //Starter spillet
         if (spaceship.x + spaceship.size > canvas.width) spaceship.x = 0;
         if (spaceship.y < 0) spaceship.y = canvas.height - spaceship.size;
         if (spaceship.y + spaceship.size > canvas.height) spaceship.y = 0;
-
-        asteroids.forEach((asteroid, i) => { //Oppdaterer og tegner de individuelle asteroidene
+        spaceship.projectiles.forEach(projectile => {
+            projectile.move();
+            if (projectile.outsideBoundary()) projectile.remove();
+            projectile.draw();
+        });
+        asteroids.forEach(asteroid => { //Oppdaterer og tegner de individuelle asteroidene
             asteroid.move();
-
+            asteroid.checkIfshot()
             //Sjekker om spaceship collider med en av asteroidene
-            for (let i = 0; i < asteroid.vertices.length - 1; i++) {
-                for (let j = 0; j < spaceship.vertices.length - 1; j++) {
-                    if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[i + 1][0], asteroid.vertices[i + 1][1], spaceship.vertices[j][0], spaceship.vertices[j][1], spaceship.vertices[j + 1][0], spaceship.vertices[j + 1][1])) gameOver(time);
+            for (let i = 0; i < asteroid.vertices.length; i++) {
+                for (let j = 0; j < spaceship.vertices.length; j++) {
+                    if (asteroid.vertices[i + 1] && spaceship.vertices[j + 1]) {
+                        if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[i + 1][0], asteroid.vertices[i + 1][1], spaceship.x + spaceship.vertices[j][0], spaceship.y + spaceship.vertices[j][1], spaceship.x + spaceship.vertices[j + 1][0], spaceship.y + spaceship.vertices[j + 1][1])) gameOver(time);
+                    }
+                    if (asteroid.vertices[i + 1] && !spaceship.vertices[j + 1]) {
+                        if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[i + 1][0], asteroid.vertices[i + 1][1], spaceship.x + spaceship.vertices[j][0], spaceship.y + spaceship.vertices[j][1], spaceship.x + spaceship.vertices[0][0], spaceship.y + spaceship.vertices[0][1])) gameOver(time);
+                    }
+                    if (!asteroid.vertices[i + 1] && spaceship.vertices[j + 1]) {
+                        if (getLineIntersection(asteroid.vertices[i][0], asteroid.vertices[i][1], asteroid.vertices[0][0], asteroid.vertices[0][1], spaceship.x + spaceship.vertices[j][0], spaceship.y + spaceship.vertices[j][1], spaceship.x + spaceship.vertices[j + 1][0], spaceship.y + spaceship.vertices[j + 1][1])) gameOver(time);
+                    }
                 }
             }
 
@@ -203,14 +266,14 @@ const startGame = () => { //Starter spillet
     createAsteroids = setInterval(() => { //Lager asteroider per tidsenhet
         let randomX = Math.random() < 0.5 ? 0 : canvas.width;
         let randomY = Math.floor(Math.random() * canvas.height);
-        let randomSize = Math.floor(Math.random() * 60) + 30;
-        let randomDx = randomX < 0.5 ? Math.random() : Math.random() * -1;
+        let randomSize = Math.floor(Math.random() * 60) + 45;
+        let randomDx = randomX < 0.5 ? Math.floor(Math.random()) + 1 : (Math.floor(Math.random()) + 1) * -1;
         let randomDy = Math.random();
-        asteroids.push(new Asteroid(randomSize, randomDx, randomDy, randomX, randomY));
+        asteroids.push(new Asteroid(randomSize, randomDx, randomDy, randomX, randomY, false));
     }, asteroidInterval);
     asteroidSpawnSpeed = setInterval(() => { //Speeder sakte opp hvor fort asteroider blir dannet
         asteroidInterval -= 50;
-    }, 10000);
+    }, 3000);
     gameTime = setInterval(() => { //Teller tiden
         time++;
     }, 1000);
@@ -224,6 +287,21 @@ const startGame = () => { //Starter spillet
 //////////////////////////////
 //Tatt fra nettet
 function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
+    // ctx.beginPath();
+    // ctx.moveTo(p0_x, p0_y)
+    // ctx.lineTo(p1_x, p1_y)
+    // ctx.lineWidth = 5;
+    // ctx.strokeStyle = 'red';
+    // ctx.stroke();
+    // ctx.closePath();
+    // ctx.beginPath();
+    // ctx.moveTo(p2_x, p2_y)
+    // ctx.lineTo(p3_x, p3_y)
+    // ctx.lineWidth = 5;
+    // ctx.strokeStyle = 'blue';
+    // ctx.stroke();
+    // ctx.closePath();
+    ctx.lineWidth = 1;
     var s1_x, s1_y, s2_x, s2_y;
     s1_x = p1_x - p0_x;
     s1_y = p1_y - p0_y;
@@ -232,7 +310,6 @@ function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
     var s, t;
     s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
     t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
-    console.log(s, t)
     if ((s >= 0 && s <= 1) && (t >= 0 && t <= 1)) return true // Collision detected;
 }
 
@@ -251,6 +328,9 @@ document.addEventListener("keyup", (e) => { //Sjekker for keyup
     if (e.key == "ArrowUp" || e.key == "w") spaceship.up = false;
     if (e.key == "ArrowLeft" || e.key == "a") spaceship.left = false;
     if (e.key == "ArrowRight" || e.key == "d") spaceship.right = false;
+});
+document.addEventListener("keypress", (e) => {
+    if (e.key == " ") spaceship.shoot();
 });
 
 
