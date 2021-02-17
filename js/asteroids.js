@@ -318,7 +318,6 @@ function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
 ////////////////////////////
 ///// EVENT LISTENERS /////
 //////////////////////////
-endButton.addEventListener("click", startGame);
 document.addEventListener("keydown", (e) => { //Sjekker for keydown
     if (e.key == "ArrowUp" || e.key == "w") spaceship.up = true;
     if (e.key == "ArrowLeft" || e.key == "a") spaceship.left = true;

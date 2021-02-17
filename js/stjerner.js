@@ -1,4 +1,4 @@
-const body = document.querySelector("body");
+const body = document.querySelector(".container");
 let stars;
 class Star {
     constructor(name, age, kelvin, distance, img, fact) {
@@ -11,6 +11,7 @@ class Star {
     }
 
     showInfo() {
+        document.querySelector("body").style.overflow = "visible";
         body.innerHTML += `<div id="contentContainer"></div>`
         document.getElementById("contentContainer").innerHTML = `<div id="headerContainer" onclick="location.href='stjerner.html'"><h1>Astrofysikk</h1><p>${this.name}</p><p>Trykk for å gå tilbake</p></div><br>`;
         document.getElementById("contentContainer").innerHTML += `<div class="starInfo"><h1>Info om ${this.name}</h1><br></div>`;
@@ -26,6 +27,7 @@ const showStar = id => {
     });
 }
 const loadPage = () => {
+    document.querySelector("body").style.overflow = "hidden";
     stars = [{
             name: 'Betelgeuse',
             age: '~7.3 ⋅ 10<sup>6</sup>',
@@ -43,12 +45,12 @@ const loadPage = () => {
             fact: 'Proxima Centauri er den stjernen som ligger nærmest solen. Den tilhører stjernebildet Kentauren, derav navnet Centauri. Den ligger i trippelstjernesystemet Alfa Centauri der den kretser rundt hovedstjernen Alfa Centauri med en omløpstid på ca. én million år. Den er en rød dverg, noe som betyr at den er relativt liten og "kjølig". Bildet over ble tatt av Hubble Teleskopet i 2013.'
         },
     ];
+    body.innerHTML += `<img class="arrowBack" src="images/arrowback.png" alt="Tilbake til hovedmeny"  width="50px" height="50px" onclick=location.href='index.html'>`
     body.innerHTML += `<div id="contentContainer"></div>`
     body.innerHTML += `<canvas id="panCanvas" width="1200px" height="1000px"></canvas>`
-    document.getElementById("contentContainer").innerHTML = `<div id="headerContainer" onclick="location.href='index.html'"><h1>Astrofysikk</h1><p>Stjerneinfo</p><p>Trykk for å gå tilbake</p></div><br>`;
     document.getElementById("contentContainer").innerHTML += `<div id="starList"></div>`;
     stars.forEach(star => {
-        document.getElementById("starList").innerHTML += `<button class="mainMenuBtn" id="${star.name}" onclick="showStar(this.id)">${star.name}</button><br>`;
+        document.getElementById("starList").innerHTML += `<button class="button" id="${star.name}" onclick="showStar(this.id)">${star.name}</button><br>`;
     });
 }
 loadPage();

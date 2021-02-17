@@ -3,7 +3,6 @@
 body {
     margin: 0;
     background-image: url('../images/background.jpeg');
-    background-size: cover;
     overflow-x: hidden;
     font-family: 'PT Sans', sans-serif;
 }
@@ -25,7 +24,7 @@ body {
 }
 
 #panningContainer {
-    width: 80%;
+    width: 100%;
     height: 100%;
     margin: auto;
 }
@@ -95,3 +94,29 @@ h5 {
     background-size: 100%;
     animation: panning 50s infinite linear;
 }
+
+.arrowBack {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.arrowBack:hover {
+    cursor: pointer;
+}
+
+.button {
+    font-size: 25px;
+    font-weight: bolder;
+    padding: 20px;
+    width: 500px;
+    margin-top: 20px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #252525;
+    outline: none;
+}
+
+.button:hover {
+    cursor: pointer;
+} 

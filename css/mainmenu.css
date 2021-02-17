@@ -86,7 +86,11 @@ body {
     top: 10px;
 }
 
-.mainMenuBtn {
+#dropDownList:hover {
+    cursor: pointer;
+}
+
+.button {
     font-size: 25px;
     font-weight: bolder;
     padding: 20px;

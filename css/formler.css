@@ -2,11 +2,12 @@
 
 #table {
     text-align: center;
-    border: 10px solid white;
+    border: 4px solid white;
     margin: auto;
+    margin-top: 10%;
     color: white;
-    padding: 20px;
-    background-color: darkcyan;
+    padding: 0;
+    background-color: rgba(51, 47, 47, 0.8);
 }
 
 body {
@@ -70,7 +71,8 @@ td {
     margin: auto;
     color: white;
     padding: 20px;
-    background-color: darkcyan;
+    background-color: rgba(51, 47, 47, 0.8);
+    margin-top: 300px;
 }
 
 .regnut:hover {

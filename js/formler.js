@@ -2,7 +2,7 @@ const contentContainer = document.getElementById("contentContainer");
 contentContainer.style.visibility = "visible";
 let equations = [];
 const showCalculator = name => {
-    contentContainer.innerHTML = `<div id="headerContainer" onclick="loadPage()"><h1>Astrofysikk</h1><p>Formelkalkulator (La ukjent være tom)</p><p>Trykk for å gå tilbake</p></div>`;
+    contentContainer.innerHTML = `<img class="arrowBack" src="images/arrowback.png" alt="Tilbake til formler"  width="50px" height="50px" onclick="loadPage()">`;
     contentContainer.innerHTML += `<div id="calculatorDiv"></div>`;
     let calcDiv = document.getElementById("calculatorDiv");
     calcDiv.innerHTML = `${name}<br>`;
@@ -96,7 +96,8 @@ const loadPage = () => {
         units: ['v = m/s', 'H = (km/s) / 10<sup>6</sup> l.y', 'r = m'],
         info: 'Galakser har en radialfart som er større jo større avstanden er fra jorda. H er Hubbles konstant og blir bestemt med stadig større nøyaktighet.',
     }, ]
-    contentContainer.innerHTML = `<div id="headerContainer" onclick="location.href='index.html'"><h1>Astrofysikk</h1><p>Formelsamling</p><p>Trykk for å gå tilbake</p></div><table id="table"><tbody id="tbody"><tr><th>Navn</th><th>Formel</th><th>Variabler</th><th>Enheter</th><th>Info</th><th>Kalkulator</th></tr></tbody></table>`
+    contentContainer.innerHTML = `<img class="arrowBack" src="images/arrowback.png" alt="Tilbake til hovedmeny"  width="50px" height="50px" onclick=location.href='index.html'>`
+    contentContainer.innerHTML += `<table id="table"><tbody id="tbody"><tr><th>Navn</th><th>Formel</th><th>Variabler</th><th>Enheter</th><th>Info</th><th>Kalkulator</th></tr></tbody></table>`
     let tbodyEL = document.getElementById("tbody");
     for (let i = 0; i < equations.length; i++) tbodyEL.innerHTML += `<tr><td>${equations[i].name}</td><td class="formel">${equations[i].equation}</td><td>${equations[i].variableMeanings.join('<div class="break"></div>')}</td><td>${equations[i].units.join('<div class="break"></div>')}</td><td class="info">${equations[i].info}</td><td><button class="regnut" onclick='showCalculator(\`${equations[i].name}\`)'>Bruk Formel</button></td></tr>`;
 }
