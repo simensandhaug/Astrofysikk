@@ -11,7 +11,6 @@ class Star {
     }
 
     showInfo() {
-        document.querySelector("body").style.overflow = "visible";
         body.innerHTML += `<div id="contentContainer"></div>`
         document.getElementById("contentContainer").innerHTML = ``;
         document.getElementById("contentContainer").innerHTML += `<div class="starInfoHeader"><h1>Info om ${this.name}</h1><br></div>`;
