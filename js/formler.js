@@ -57,6 +57,7 @@ const calculate = name => {
             }
     }
     let i = 0;
+
     function typeOutput() {
         if (i < outputValue.length) {
             output.innerHTML += outputValue.charAt(i);
@@ -65,6 +66,18 @@ const calculate = name => {
         }
     }
     typeOutput();
+}
+
+const writeHeader = (header, output) => {
+    let i = 0;
+    setInterval(() => {
+        if (i < header.length) output.innerHTML += header.charAt(i);
+        else {
+            if (i % 2 == 0) output.innerHTML += "_";
+            else output.innerHTML = output.innerHTML.replace("_", "");
+        }
+        i++
+    }, 300);
 }
 const loadPage = () => {
     equations = [{
@@ -97,8 +110,10 @@ const loadPage = () => {
         info: 'Galakser har en radialfart som er større jo større avstanden er fra jorda. H er Hubbles konstant og blir bestemt med stadig større nøyaktighet.',
     }, ]
     contentContainer.innerHTML = `<img class="arrowBack" src="images/arrowback.png" alt="Tilbake til hovedmeny"  width="50px" height="50px" onclick=location.href='index.html'>`
+    contentContainer.innerHTML += `<h1 id="title"></h1>`;
     contentContainer.innerHTML += `<table id="table"><tbody id="tbody"><tr><th>Navn</th><th>Formel</th><th>Variabler</th><th>Enheter</th><th>Info</th><th>Kalkulator</th></tr></tbody></table>`
     let tbodyEL = document.getElementById("tbody");
     for (let i = 0; i < equations.length; i++) tbodyEL.innerHTML += `<tr><td>${equations[i].name}</td><td class="formel">${equations[i].equation}</td><td>${equations[i].variableMeanings.join('<div class="break"></div>')}</td><td>${equations[i].units.join('<div class="break"></div>')}</td><td class="info">${equations[i].info}</td><td><button class="regnut" onclick='showCalculator(\`${equations[i].name}\`)'>Bruk Formel</button></td></tr>`;
+    writeHeader('Formler', document.getElementById("title"))
 }
 loadPage();

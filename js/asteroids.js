@@ -318,6 +318,7 @@ function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
 ////////////////////////////
 ///// EVENT LISTENERS /////
 //////////////////////////
+document.getElementById("asteroidsEndButton").addEventListener("click", startGame);
 document.addEventListener("keydown", (e) => { //Sjekker for keydown
     if (e.key == "ArrowUp" || e.key == "w") spaceship.up = true;
     if (e.key == "ArrowLeft" || e.key == "a") spaceship.left = true;
@@ -338,3 +339,17 @@ document.addEventListener("keypress", (e) => {
 ///// INITIALIZE GAME /////
 //////////////////////////
 startGame();
+
+const writeHeader = (header, output) => {
+    let i = 0;
+    setInterval(() => {
+        if(i < header.length) output.innerHTML += header.charAt(i);
+        else {
+            if(i%2 == 0) output.innerHTML += "_";
+            else output.innerHTML = output.innerHTML.replace("_", "");
+        }
+        i++
+    }, 300);
+}
+
+writeHeader('Asteroids', document.getElementById("title"))

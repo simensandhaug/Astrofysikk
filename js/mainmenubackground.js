@@ -12,16 +12,16 @@ const toggleButtons = () => {
 }
 
 let header = "Astrofysikk";
-const writeHeader = () => {
+const writeHeader = (header, output) => {
     let i = 0;
     setInterval(() => {
-        if(i < header.length) titleEl.innerHTML += header.charAt(i);
+        if(i < header.length) output.innerHTML += header.charAt(i);
         else {
-            if(i%2 == 0) titleEl.innerHTML += "_";
-            else titleEl.innerHTML = titleEl.innerHTML.replace("_", "");
+            if(i%2 == 0) output.innerHTML += "_";
+            else output.innerHTML = output.innerHTML.replace("_", "");
         }
         i++
-    }, 500);
+    }, 300);
 }
-writeHeader();
+writeHeader(header, titleEl);
 

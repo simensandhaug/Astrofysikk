@@ -18,7 +18,6 @@ body {
     text-align: center;
     box-shadow: 0px 0px 8px 7px #888888;
     background-color: rgba(51, 47, 47, 0.8);
-    margin-top: 5%;
     color: #cecece;
     font-family: 'Pathway Gothic One', sans-serif;
 }
@@ -53,15 +52,42 @@ h5 {
 }
 
 .starInfo {
-    padding: 10px;
-    margin: auto;
-    margin-top: 5px;
+    top: 5%;
+    right: 70%;
+    position: absolute;
+    padding: 5px;
+    width: 480px;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.8);
+    color: #cecece;
+    outline: none; 
+}
+
+.starInfoHeader {
+    top: 5%;
+    left: 37.1%;
+    position: absolute;
+    padding: 5px;
     width: 480px;
     text-align: center;
     box-shadow: 0px 0px 8px 7px #888888;
     background-color: rgba(51, 47, 47, 0.8);
     color: #cecece;
     outline: none;
+}
+
+.starFact {
+    top: 5%;
+    left: 70%;
+    position: absolute;
+    padding: 5px;
+    width: 480px;
+    text-align: center;
+    box-shadow: 0px 0px 8px 7px #888888;
+    background-color: rgba(51, 47, 47, 0.8);
+    color: #cecece;
+    outline: none; 
 }
 
 @keyframes panning {
