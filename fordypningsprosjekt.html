@@ -33,17 +33,38 @@
             <select id="bodySelect" name="bodySelect">
             </select>
             <br>
-            <label for="mass">Mass: </label><input class="optionInput" name="mass" type="number" id="massInput"
-                placeholder="kg">
-            <button class="set" onclick="setMass()">Set</button>
             <br>
-            <label for="radius">Radius: </label><input class="optionInput" name="radius" type="number" id="radiusInput"
-                placeholder="km">
-            <button class="set" onclick="setRadius()">Set</button>
+            <label for="massInput">Mass: </label><input class="optionInput" type="number" id="massInput">
+            <br>
+            <label for="xInput">x: </label><input class="optionInput" type="number" id="xInput">
+            <br>
+            <label for="yInput">y: </label><input class="optionInput" type="number" id="yInput">
+            <br>
+            <button class="gButton" onclick="setBody()">Set</button>
+            <br>
+            <button class="gButton" onclick="deleteBody()">Delete</button>
+            <div id="lineBreak"></div>
+            <p class="optionHeader">Create new body</p>
+            <label for="createX">x:</label><input type="number" min="0" id="createX" class="optionInput"> <br>
+            <label for="createY">y:</label><input type="number" min="0" id="createY" class="optionInput"> <br>
+            <label for="createM">Mass:</label><input type="number" min="0" max="250" id="createM" class="optionInput">
+            <br>
+            <label for="createVX">Velocity-x:</label><input type="number" min="0" max="10" id="createVX"
+                class="optionInput"> <br>
+            <label for="createVY">Velocity-y:</label><input type="number" min="0" max="10" id="createVY"
+                class="optionInput"> <br>
+            <label for="createName">Name:</label><input type="text" id="createName" class="optionInput" maxlength="8"> <br>
+            <button class="gButton" onclick="createBody()">Create</button>
             <div id="lineBreak"></div>
             <p class="optionHeader">Universal options</p>
-            <label for="orbitCheck">Draw Orbits:</label><input type="checkbox" id="orbitCheck" checked>
-            <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" checked>
+            <div id="universalOptions">
+                <label for="orbitCheck">Draw Orbits:</label><input type="checkbox" id="orbitCheck" checked>
+                <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" checked>
+                <label for="nameCheck">Draw Names:</label><input type="checkbox" id="nameCheck" checked>
+            </div>
+            <button class="gButton" onclick="pauseInterval()">Pause</button>
+            <br>
+            <button class="gButton" onclick="startInterval()">Resume</button>
         </div>
     </div>
 </body>
