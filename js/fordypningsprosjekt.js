@@ -13,6 +13,9 @@ class Game {
         this.g = 6.674e-3;
         this.celestialBodyArr = [];
         this.gameInterval;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.holdInterval;
     }
     update = () => {
         this.target = this.celestialBodyArr[document.getElementById("bodySelect").selectedIndex];
@@ -73,6 +76,7 @@ class CelestialBody {
         this.r = this.mass / 5;
         this.trail = [];
         this.name = n;
+        this.held = false;
     }
     attract = () => {
         game.celestialBodyArr.forEach(body => {
@@ -144,9 +148,9 @@ const setBody = () => {
     if (!m == "") game.target.mass = parseFloat(m);
     if (!x == "") game.target.pos.x = parseFloat(x);
     if (!y == "") game.target.pos.y = parseFloat(y);
-    x.value = "";
-    y.value = "";
-    m.value = "";
+    document.getElementById("xInput").value = "";
+    document.getElementById("yInput").value = "";
+    document.getElementById("massInput").value = "";
 }
 const createBody = () => {
     createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value);
@@ -175,6 +179,13 @@ const writeHeader = (header, output) => {
         i++
     }, 300);
 }
+const getMousePos = (canvas, evt) => {
+    let rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+}
 
 
 ///////////////////
@@ -192,3 +203,31 @@ game.drawInterval();
 //////////////////////
 // EVENT LISTENERS //
 ////////////////////
+
+document.addEventListener("mousemove", (e) => {
+    let mousePos = getMousePos(canvas, e);
+    game.mouseX = mousePos.x;
+    game.mouseY = mousePos.y;
+});
+
+document.addEventListener("mousedown", () => {
+    game.celestialBodyArr.forEach(body => {
+        if(game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
+            game.target = body;
+            body.held = true;
+            canvas.style.cursor = "pointer";
+            game.holdInterval = setInterval(()=> {
+                if(body.held) {
+                    body.pos.x = game.mouseX;
+                    body.pos.y = game.mouseY;
+                }
+            }, 10);
+        }
+    });
+});
+
+document.addEventListener("mouseup", () => {
+    game.celestialBodyArr.forEach(body => body.held = false);
+    clearInterval(game.holdInterval);
+    canvas.style.cursor = "auto";
+});
