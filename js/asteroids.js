@@ -340,4 +340,18 @@ document.addEventListener("keypress", (e) => {
 //////////////////////////
 startGame();
 
+const writeHeader = (header, output) => {
+    document.getElementById("title").innerHTML = "";
+    let i = 0;
+    setInterval(() => {
+        if (i < header.length) output.innerHTML += header.charAt(i);
+        else {
+            if (i % 2 == 0) output.innerHTML += "_";
+            else output.innerHTML = output.innerHTML.replace("_", "");
+        }
+        i++
+    }, 300);
+}
+writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
+
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"))

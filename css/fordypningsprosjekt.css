@@ -29,6 +29,24 @@
     color: white;
 }
 
+#info {
+    background-color: rgba(49, 49, 49, 0.3);
+    display: inline;
+    text-align: center;
+    position: absolute;
+    width: 40%;
+    height: 30px;
+    top: 10.5%;
+    padding: 5px;
+    left: 8.45%;
+    color: white;
+}
+
+.infoP {
+    display: inline-block;
+    margin-right: 40px;
+}
+
 .optionInput {
     width: auto;
 }

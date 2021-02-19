@@ -20,29 +20,30 @@
         <canvas id="canvas" width="1600px" height="800px">
 
         </canvas>
+        <div id="info">
+            <p id="targetMass" class="infoP">Target Mass:</p>
+            <p id="targetRadius" class="infoP"></p>
+            <p id="targetPos" class="infoP"></p>
+            <p id="targetVelocity" class="infoP"></p>
+        </div>
         <div id="options">
             <p class="optionHeader">Celestial body options</p>
             <br>
             <label for="bodySelect">Target: </label>
             <select id="bodySelect" name="bodySelect">
-                <option value="0">CelestialBodyArr[0]</option>
-                <option value="1">CelestialBodyArr[1]</option>
             </select>
             <br>
-            <label for="mass">Masse: </label><input class="optionInput" name="mass" type="number" id="massInput"
+            <label for="mass">Mass: </label><input class="optionInput" name="mass" type="number" id="massInput"
                 placeholder="kg">
+            <button class="set" onclick="setMass()">Set</button>
             <br>
             <label for="radius">Radius: </label><input class="optionInput" name="radius" type="number" id="radiusInput"
                 placeholder="km">
+            <button class="set" onclick="setRadius()">Set</button>
             <div id="lineBreak"></div>
             <p class="optionHeader">Universal options</p>
-            <br>
-            <label for="scale">Scale:</label>
-            <input name="scale" type="range" min="1" max="100" value="1" id="scale">
-            <br>
-            <label for="time">Time:</label>
-            <input name="time" type="range" min="1" max="100" value="1" id="time">
-            <br>
+            <label for="orbitCheck">Draw Orbits:</label><input type="checkbox" id="orbitCheck" checked>
+            <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" checked>
         </div>
     </div>
 </body>
