@@ -40,6 +40,10 @@ class Game {
         }, this.interval);
     }
     pauseInterval = () => clearInterval(this.gameInterval);
+    changeInterval = () => {
+        this.interval = 1000 / parseFloat(document.getElementById("time").value);
+        this.startInterval();
+    }
     drawInterval = () => {
         setInterval(() => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -68,7 +72,7 @@ class Vector {
     }
 }
 class CelestialBody {
-    constructor(x, y, m, vx, vy, n) {
+    constructor(x, y, m, vx, vy, n, mCenter) {
         this.pos = new Vector(x, y);
         this.vel = new Vector(vx, vy);
         this.acc = new Vector(0, 0);
@@ -77,6 +81,7 @@ class CelestialBody {
         this.trail = [];
         this.name = n;
         this.held = false;
+        this.mCenter = mCenter;
     }
     attract = () => {
         game.celestialBodyArr.forEach(body => {
@@ -90,7 +95,7 @@ class CelestialBody {
         });
     }
     applyForce = force => {
-        this.acc = this.acc.add(force.div(this.mass));
+        if (!this.mCenter) this.acc = this.acc.add(force.div(this.mass));
     }
     update = () => {
         this.pos = this.pos.add(this.vel);
@@ -136,8 +141,8 @@ class CelestialBody {
 ////////////////
 // FUNCTIONS //
 //////////////
-const createCelestialBody = (x, y, m, vx, vy, n) => {
-    game.celestialBodyArr.push(new CelestialBody(x, y, m, vx, vy, n));
+const createCelestialBody = (x, y, m, vx, vy, n, mCenter) => {
+    game.celestialBodyArr.push(new CelestialBody(x, y, m, vx, vy, n, mCenter));
     document.getElementById("bodySelect").innerHTML = "";
     for (let i = 0; i < game.celestialBodyArr.length; i++) document.getElementById("bodySelect").innerHTML += `<option value="${i}">${game.celestialBodyArr[i].name}</option>`;
 }
@@ -153,13 +158,14 @@ const setBody = () => {
     document.getElementById("massInput").value = "";
 }
 const createBody = () => {
-    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value);
+    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createmCenter").checked);
     document.getElementById("createX").value = "";
     document.getElementById("createY").value = "";
     document.getElementById("createM").value = "";
     document.getElementById("createVX").value = "";
     document.getElementById("createVY").value = "";
     document.getElementById("createName").value = "";
+    document.getElementById("createmCenter").checked = false;
 }
 const deleteBody = () => {
     game.celestialBodyArr.splice(game.celestialBodyArr.indexOf(game.target), 1);
@@ -182,8 +188,8 @@ const writeHeader = (header, output) => {
 const getMousePos = (canvas, evt) => {
     let rect = canvas.getBoundingClientRect();
     return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
     };
 }
 
@@ -192,10 +198,11 @@ const getMousePos = (canvas, evt) => {
 // DECLARATIONS //
 /////////////////
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
-createCelestialBody(canvas.width / 2 - 100, canvas.height / 2, 50, 0, -3, 'A');
-createCelestialBody(canvas.width / 2 + 100, canvas.height / 2, 50, 0, 3, 'B');
-createCelestialBody(canvas.width / 2, canvas.height / 2 + 100, 50, -3, 0, 'C');
-createCelestialBody(canvas.width / 2, canvas.height / 2 - 100, 50, 3, 0, 'D');
+// createCelestialBody(canvas.width / 2 - 100, canvas.height / 2, 50, 0, -3, 'A', false);
+// createCelestialBody(canvas.width / 2 + 100, canvas.height / 2, 50, 0, 3, 'B', false);
+// createCelestialBody(canvas.width / 2, canvas.height / 2 + 100, 50, -3, 0, 'C', false);
+// createCelestialBody(canvas.width / 2, canvas.height / 2 - 100, 50, 3, 0, 'D', false);
+createCelestialBody(canvas.width / 2, canvas.height / 2, 100, 0, 0, 'Sola', true);
 game.startInterval();
 game.drawInterval();
 
@@ -212,12 +219,12 @@ document.addEventListener("mousemove", (e) => {
 
 document.addEventListener("mousedown", () => {
     game.celestialBodyArr.forEach(body => {
-        if(game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
+        if (game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
             game.target = body;
             body.held = true;
             canvas.style.cursor = "pointer";
-            game.holdInterval = setInterval(()=> {
-                if(body.held) {
+            game.holdInterval = setInterval(() => {
+                if (body.held) {
                     body.pos.x = game.mouseX;
                     body.pos.y = game.mouseY;
                 }
@@ -231,3 +238,7 @@ document.addEventListener("mouseup", () => {
     clearInterval(game.holdInterval);
     canvas.style.cursor = "auto";
 });
+
+document.getElementById("time").addEventListener("change", () => {
+    game.changeInterval();
+})

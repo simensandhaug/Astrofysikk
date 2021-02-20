@@ -53,7 +53,10 @@
                 class="optionInput"> <br>
             <label for="createVY">Velocity-y:</label><input type="number" min="0" max="10" id="createVY"
                 class="optionInput"> <br>
-            <label for="createName">Name:</label><input type="text" id="createName" class="optionInput" maxlength="8"> <br>
+            <label for="createName">Name:</label><input type="text" id="createName" class="optionInput" maxlength="8">
+            <br>
+            <label for="createmCenter">Immovable:</label><input type="checkbox" id="createmCenter" class="optionInput">
+            <br>
             <button class="gButton" onclick="createBody()">Create</button>
             <div id="lineBreak"></div>
             <p class="optionHeader">Universal options</p>
@@ -62,6 +65,8 @@
                 <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" checked>
                 <label for="nameCheck">Draw Names:</label><input type="checkbox" id="nameCheck" checked>
             </div>
+            <label for="time">Simulation-speed</label><input type="range" min="30" value="60" max="144" id="time">
+            <br>
             <button class="gButton" onclick="pauseInterval()">Pause</button>
             <br>
             <button class="gButton" onclick="startInterval()">Resume</button>
