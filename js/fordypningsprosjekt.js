@@ -3,13 +3,14 @@
 /////////////////
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const fpsDiv = document.getElementById("fps");
 
 //////////////
 // CLASSES //
 ////////////
 class Game {
     constructor() {
-        this.speed = 10;
+        this.speed = 500;
         this.deltaTime;
         this.isPaused = true;
         this.g = 6.67408e-11;
@@ -26,7 +27,7 @@ class Game {
         this.xPrevious;
         this.yPrevious;
         this.scale = 10 / 70e8;
-        this.radiusScale = 1000000;
+        this.radiusScale = 100000;
     }
 
     update = () => {
@@ -240,7 +241,7 @@ writeHeader(document.getElementById("title").innerHTML, document.getElementById(
 //createCelestialBody(-aphelionDist, 0, earthMass, earthRadius, 0, -aphelionSpeed, 'C', false, 'white');
 //createCelestialBody(0, aphelionDist, earthMass, earthRadius, -aphelionSpeed, 0, 'C', false, 'white');
 createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false, 'lime');
-createCelestialBody(0, -aphelionDist - moonDistanceToEarth, moonMass, moonRadius, moonRelativeSpeed + aphelionSpeed, 0, 'Månen', false, 'grey');
+createCelestialBody(0, -aphelionDist - moonDistanceToEarth, moonMass, moonRadius, moonRelativeSpeed + aphelionSpeed, 0, 'Beta Planet', false, 'grey');
 createCelestialBody(0, 0, sunMass, sunRadius, 0, 0, 'Sola', false, 'yellow');
 game.drawInterval();
 
@@ -307,6 +308,7 @@ canvas.addEventListener("wheel", e => {
 let prevTime = 0;
 function loop(time = 0){
     game.deltaTime = time - prevTime;
+    fpsDiv.innerHTML = "FPS: " + Math.round(1 /(game.deltaTime / 1000));
     prevTime = time;
     if(!game.isPaused) game.update();
     requestAnimationFrame(loop);
