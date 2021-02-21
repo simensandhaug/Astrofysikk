@@ -13,6 +13,8 @@ class Game {
         this.g = 6.674e-3;
         this.celestialBodyArr = [];
         this.gameInterval;
+        this.drawingInterval;
+        this.drawOnlyTarget;
         this.mouseX = 0;
         this.mouseY = 0;
         this.holdInterval;
@@ -43,14 +45,17 @@ class Game {
     changeInterval = () => {
         this.interval = 1000 / parseFloat(document.getElementById("time").value);
         this.startInterval();
+        this.drawInterval();
     }
     drawInterval = () => {
-        setInterval(() => {
+        clearInterval(this.drawingInterval);
+        this.drawingInterval = setInterval(() => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             this.draw();
             if (document.getElementById("vectorCheck").checked) this.drawVectors();
             if (document.getElementById("orbitCheck").checked) this.drawOrbits();
             if (document.getElementById("nameCheck").checked) this.drawNames();
+            this.drawOnlyTarget = document.getElementById("onlyTargetCheck").checked;
         }, this.interval);
     }
 }
@@ -72,7 +77,7 @@ class Vector {
     }
 }
 class CelestialBody {
-    constructor(x, y, m, vx, vy, n, mCenter) {
+    constructor(x, y, m, vx, vy, n, mCenter, color) {
         this.pos = new Vector(x, y);
         this.vel = new Vector(vx, vy);
         this.acc = new Vector(0, 0);
@@ -82,6 +87,7 @@ class CelestialBody {
         this.name = n;
         this.held = false;
         this.mCenter = mCenter;
+        this.color = color;
     }
     attract = () => {
         game.celestialBodyArr.forEach(body => {
@@ -106,7 +112,7 @@ class CelestialBody {
         if (this.trail.length > 250) this.trail.shift();
     }
     draw = () => {
-        ctx.fillStyle = this == game.target ? 'red' : 'white';
+        ctx.fillStyle = this == game.target ? 'red' : this.color;
         ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.arc(this.pos.x, this.pos.y, this.r, 0, Math.PI * 2);
@@ -115,25 +121,46 @@ class CelestialBody {
     }
     drawVector = () => {
         ctx.strokeStyle = this == game.target ? 'red' : 'white';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(this.pos.x, this.pos.y);
-        ctx.lineTo(this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10);
-        ctx.stroke();
+        if (game.drawOnlyTarget && game.target == this) {
+            ctx.moveTo(this.pos.x, this.pos.y);
+            ctx.lineTo(this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10);
+            ctx.stroke();
+        }
+        if (!game.drawOnlyTarget) {
+            ctx.moveTo(this.pos.x, this.pos.y);
+            ctx.lineTo(this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10);
+            ctx.stroke();
+        }
         ctx.closePath();
     }
     drawOrbit = () => {
-        ctx.fillStyle = 'blue';
-        for (let i = 0; i < this.trail.length; i++) {
-            ctx.beginPath();
-            ctx.arc(this.trail[i].x, this.trail[i].y, 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.closePath();
+        if (!this.mCenter) {
+            ctx.fillStyle = 'blue';
+            if (game.drawOnlyTarget && game.target == this) {
+                for (let i = 0; i < this.trail.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(this.trail[i].x, this.trail[i].y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+            if (!game.drawOnlyTarget) {
+                for (let i = 0; i < this.trail.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(this.trail[i].x, this.trail[i].y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
         }
     }
     drawName = () => {
         ctx.fillStyle = 'white';
         ctx.font = '20px Arial';
-        ctx.fillText(this.name, this.pos.x + 20, this.pos.y - 20);
+        if (game.drawOnlyTarget && game.target == this) ctx.fillText(this.name, this.pos.x + 20, this.pos.y - 20);
+        if (!game.drawOnlyTarget) ctx.fillText(this.name, this.pos.x + 20, this.pos.y - 20);
     }
 }
 
@@ -141,8 +168,8 @@ class CelestialBody {
 ////////////////
 // FUNCTIONS //
 //////////////
-const createCelestialBody = (x, y, m, vx, vy, n, mCenter) => {
-    game.celestialBodyArr.push(new CelestialBody(x, y, m, vx, vy, n, mCenter));
+const createCelestialBody = (x, y, m, vx, vy, n, mCenter, color) => {
+    game.celestialBodyArr.push(new CelestialBody(x, y, m, vx, vy, n, mCenter, color));
     document.getElementById("bodySelect").innerHTML = "";
     for (let i = 0; i < game.celestialBodyArr.length; i++) document.getElementById("bodySelect").innerHTML += `<option value="${i}">${game.celestialBodyArr[i].name}</option>`;
 }
@@ -158,7 +185,7 @@ const setBody = () => {
     document.getElementById("massInput").value = "";
 }
 const createBody = () => {
-    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createmCenter").checked);
+    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createmCenter").checked, document.getElementById("createColor").value);
     document.getElementById("createX").value = "";
     document.getElementById("createY").value = "";
     document.getElementById("createM").value = "";
@@ -166,6 +193,7 @@ const createBody = () => {
     document.getElementById("createVY").value = "";
     document.getElementById("createName").value = "";
     document.getElementById("createmCenter").checked = false;
+    document.getElementById("createColor").value = "";
 }
 const deleteBody = () => {
     game.celestialBodyArr.splice(game.celestialBodyArr.indexOf(game.target), 1);
@@ -198,11 +226,11 @@ const getMousePos = (canvas, evt) => {
 // DECLARATIONS //
 /////////////////
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
-// createCelestialBody(canvas.width / 2 - 100, canvas.height / 2, 50, 0, -3, 'A', false);
-// createCelestialBody(canvas.width / 2 + 100, canvas.height / 2, 50, 0, 3, 'B', false);
-// createCelestialBody(canvas.width / 2, canvas.height / 2 + 100, 50, -3, 0, 'C', false);
-// createCelestialBody(canvas.width / 2, canvas.height / 2 - 100, 50, 3, 0, 'D', false);
-createCelestialBody(canvas.width / 2, canvas.height / 2, 100, 0, 0, 'Sola', true);
+createCelestialBody(canvas.width / 2 - 100, canvas.height / 2, 50, 0, -3, 'A', false, 'white');
+createCelestialBody(canvas.width / 2 + 100, canvas.height / 2, 50, 0, 3, 'B', false, 'white');
+createCelestialBody(canvas.width / 2, canvas.height / 2 + 100, 50, -3, 0, 'C', false, 'white');
+createCelestialBody(canvas.width / 2, canvas.height / 2 - 100, 50, 3, 0, 'D', false, 'white');
+createCelestialBody(canvas.width / 2, canvas.height / 2, 100, 0, 0, 'Sola', true, 'yellow');
 game.startInterval();
 game.drawInterval();
 
@@ -215,6 +243,11 @@ document.addEventListener("mousemove", (e) => {
     let mousePos = getMousePos(canvas, e);
     game.mouseX = mousePos.x;
     game.mouseY = mousePos.y;
+    game.celestialBodyArr.forEach(body => {
+        if (game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
+            canvas.style.cursor = "pointer";
+        } else canvas.style.cursor = "auto";
+    });
 });
 
 document.addEventListener("mousedown", () => {
@@ -222,7 +255,6 @@ document.addEventListener("mousedown", () => {
         if (game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
             game.target = body;
             body.held = true;
-            canvas.style.cursor = "pointer";
             game.holdInterval = setInterval(() => {
                 if (body.held) {
                     body.pos.x = game.mouseX;
@@ -236,7 +268,6 @@ document.addEventListener("mousedown", () => {
 document.addEventListener("mouseup", () => {
     game.celestialBodyArr.forEach(body => body.held = false);
     clearInterval(game.holdInterval);
-    canvas.style.cursor = "auto";
 });
 
 document.getElementById("time").addEventListener("change", () => {

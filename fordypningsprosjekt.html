@@ -55,17 +55,24 @@
                 class="optionInput"> <br>
             <label for="createName">Name:</label><input type="text" id="createName" class="optionInput" maxlength="8">
             <br>
+            <label for="createColor">Hex:</label><input type="text" id="createColor" class="optionInput" max="7">
+            <br>
             <label for="createmCenter">Immovable:</label><input type="checkbox" id="createmCenter" class="optionInput">
             <br>
             <button class="gButton" onclick="createBody()">Create</button>
             <div id="lineBreak"></div>
             <p class="optionHeader">Universal options</p>
             <div id="universalOptions">
-                <label for="orbitCheck">Draw Orbits:</label><input type="checkbox" id="orbitCheck" checked>
-                <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" checked>
-                <label for="nameCheck">Draw Names:</label><input type="checkbox" id="nameCheck" checked>
+                <label for="orbitCheck">Draw Orbits:</label><input type="checkbox" id="orbitCheck" class="optionInput" checked>
+                <br>
+                <label for="vectorCheck">Draw Vectors:</label><input type="checkbox" id="vectorCheck" class="optionInput" checked>
+                <br>
+                <label for="onlyTargetCheck">Draw Only Target</label><input type="checkbox" id="onlyTargetCheck" class="optionInput">
+                <br>
+                <label for="nameCheck">Draw Names:</label><input type="checkbox" id="nameCheck" class="optionInput" checked>
+                <br>
+                <label for="time">Speed:</label><input type="range" min="30" value="60" max="100" id="time" class="optionInput">
             </div>
-            <label for="time">Simulation-speed</label><input type="range" min="30" value="60" max="144" id="time">
             <br>
             <button class="gButton" onclick="pauseInterval()">Pause</button>
             <br>
