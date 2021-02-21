@@ -9,8 +9,10 @@ const ctx = canvas.getContext("2d");
 ////////////
 class Game {
     constructor() {
-        this.interval = 1000 / 60;
-        this.g = 6.674e-3;
+        this.speed = 10;
+        this.deltaTime;
+        this.isPaused = true;
+        this.g = 6.67408e-11;
         this.celestialBodyArr = [];
         this.gameInterval;
         this.drawingInterval;
@@ -18,7 +20,15 @@ class Game {
         this.mouseX = 0;
         this.mouseY = 0;
         this.holdInterval;
+        this.xOffset = 0;
+        this.yOffset = 0;
+        this.isMousePressed = false;
+        this.xPrevious;
+        this.yPrevious;
+        this.scale = 10 / 70e8;
+        this.radiusScale = 1000000;
     }
+
     update = () => {
         this.target = this.celestialBodyArr[document.getElementById("bodySelect").selectedIndex];
         if (this.target) {
@@ -30,22 +40,17 @@ class Game {
         this.celestialBodyArr.forEach(body => body.update());
     }
     draw = () => this.celestialBodyArr.forEach(body => body.draw());
-    attract = () => this.celestialBodyArr.forEach(body => body.attract());
     drawVectors = () => this.celestialBodyArr.forEach(body => body.drawVector());
     drawOrbits = () => this.celestialBodyArr.forEach(body => body.drawOrbit());
     drawNames = () => this.celestialBodyArr.forEach(body => body.drawName());
-    startInterval = () => {
-        clearInterval(this.gameInterval);
-        this.gameInterval = setInterval(() => {
-            this.update();
-            this.attract();
-        }, this.interval);
+    changeSpeed = () => {
+        this.speed = parseFloat(document.getElementById("time").value);
     }
-    pauseInterval = () => clearInterval(this.gameInterval);
-    changeInterval = () => {
-        this.interval = 1000 / parseFloat(document.getElementById("time").value);
-        this.startInterval();
-        this.drawInterval();
+    pauseInterval = () =>{
+        this.isPaused = true;
+    }
+    startInterval = () =>{
+        this.isPaused = false;
     }
     drawInterval = () => {
         clearInterval(this.drawingInterval);
@@ -65,10 +70,10 @@ class Vector {
         this.x = x;
         this.y = y;
     }
-    add = v => typeof v == 'object' ? new Vector(this.x + v.x, this.y + v.y) : new Vector(this.x + v, this.y + v);
-    sub = v => typeof v == 'object' ? new Vector(this.x - v.x, this.y - v.y) : new Vector(this.x - v, this.y - v);
-    mul = v => typeof v == 'object' ? new Vector(this.x * v.x, this.y * v.y) : new Vector(this.x * v, this.y * v);
-    div = v => typeof v == 'object' ? new Vector(this.x / v.x, this.y / v.y) : new Vector(this.x / v, this.y / v);
+    add = v => new Vector(this.x + v.x, this.y + v.y);
+    sub = v => new Vector(this.x - v.x, this.y - v.y);
+    mul = v => new Vector(this.x * v, this.y * v);
+    div = v => new Vector(this.x / v, this.y / v);
     mag = () => Math.sqrt(this.x * this.x + this.y * this.y);
     setMag = strength => {
         let currentMag = this.mag();
@@ -77,36 +82,38 @@ class Vector {
     }
 }
 class CelestialBody {
-    constructor(x, y, m, vx, vy, n, mCenter, color) {
+    constructor(x, y, mass, radius, vx, vy, name, isImmovable, color) {
         this.pos = new Vector(x, y);
         this.vel = new Vector(vx, vy);
         this.acc = new Vector(0, 0);
-        this.mass = m;
-        this.r = this.mass / 5;
+        this.mass = mass;
+        this.r = radius;
         this.trail = [];
-        this.name = n;
+        this.name = name;
         this.held = false;
-        this.mCenter = mCenter;
+        this.isImmovable = isImmovable;
         this.color = color;
     }
-    attract = () => {
+    computeAcceleration = () => {
+        let acc = new Vector(0, 0);
+        if (this.isImmovable) return acc;
         game.celestialBodyArr.forEach(body => {
             if (body == this) return;
-            let force = new Vector(this.pos.x, this.pos.y);
-            force = force.sub(body.pos);
-            let dSq = Math.sqrt(force.mag());
-            let strength = game.g * (this.mass * body.mass) / dSq;
-            force.setMag(strength);
-            body.applyForce(force);
+            let delta = body.pos.sub(this.pos);
+
+            let strength = game.g * this.mass * body.mass / Math.pow(delta.mag(), 2);
+
+            delta.setMag(strength/this.mass);
+            acc = acc.add(delta);
         });
+
+        return acc;
     }
-    applyForce = force => {
-        if (!this.mCenter) this.acc = this.acc.add(force.div(this.mass));
-    }
+
     update = () => {
-        this.pos = this.pos.add(this.vel);
-        this.vel = this.vel.add(this.acc);
-        this.acc = new Vector(0, 0);
+        this.acc = this.computeAcceleration();
+        this.vel = this.vel.add(this.acc.mul(game.speed * game.deltaTime));
+        this.pos = this.pos.add(this.vel.mul(game.speed * game.deltaTime));
 
         this.trail.push(this.pos);
         if (this.trail.length > 250) this.trail.shift();
@@ -115,7 +122,7 @@ class CelestialBody {
         ctx.fillStyle = this == game.target ? 'red' : this.color;
         ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.arc(this.pos.x, this.pos.y, this.r, 0, Math.PI * 2);
+        ctx.arc(this.pos.x * game.scale + game.xOffset + canvas.width / 2, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset, this.r * game.scale, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
     }
@@ -124,33 +131,35 @@ class CelestialBody {
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         if (game.drawOnlyTarget && game.target == this) {
-            ctx.moveTo(this.pos.x, this.pos.y);
-            ctx.lineTo(this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10);
+            ctx.moveTo(canvas.width / 2 + this.pos.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset);
+            ctx.lineTo(canvas.width / 2 + this.pos.x * game.scale + game.radiusScale*this.vel.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - game.radiusScale* this.vel.y * game.scale + game.yOffset);
             ctx.stroke();
         }
         if (!game.drawOnlyTarget) {
-            ctx.moveTo(this.pos.x, this.pos.y);
-            ctx.lineTo(this.pos.x + this.vel.x * 10, this.pos.y + this.vel.y * 10);
+            ctx.moveTo(canvas.width / 2 + this.pos.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset);
+            ctx.lineTo(canvas.width / 2 + this.pos.x * game.scale + game.radiusScale*this.vel.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - game.radiusScale*this.vel.y * game.scale + game.yOffset);
             ctx.stroke();
         }
         ctx.closePath();
     }
     drawOrbit = () => {
-        if (!this.mCenter) {
-            ctx.fillStyle = 'blue';
+        if (!this.isImmovable) {
+            ctx.strokeStyle = 'blue';
             if (game.drawOnlyTarget && game.target == this) {
-                for (let i = 0; i < this.trail.length; i++) {
+                for (let i = 1; i < this.trail.length; i++) {
                     ctx.beginPath();
-                    ctx.arc(this.trail[i].x, this.trail[i].y, 2, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.moveTo(canvas.width / 2 + this.trail[i - 1].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i - 1].y * game.scale) + game.yOffset);
+                    ctx.lineTo(canvas.width / 2 + this.trail[i].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i].y * game.scale) + game.yOffset);
+                    ctx.stroke();
                     ctx.closePath();
                 }
             }
             if (!game.drawOnlyTarget) {
-                for (let i = 0; i < this.trail.length; i++) {
+                for (let i = 1; i < this.trail.length; i++) {
                     ctx.beginPath();
-                    ctx.arc(this.trail[i].x, this.trail[i].y, 2, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.moveTo(canvas.width / 2 + this.trail[i - 1].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i - 1].y * game.scale) + game.yOffset);
+                    ctx.lineTo(canvas.width / 2 + this.trail[i].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i].y * game.scale) + game.yOffset);
+                    ctx.stroke();
                     ctx.closePath();
                 }
             }
@@ -158,9 +167,10 @@ class CelestialBody {
     }
     drawName = () => {
         ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        if (game.drawOnlyTarget && game.target == this) ctx.fillText(this.name, this.pos.x + 20, this.pos.y - 20);
-        if (!game.drawOnlyTarget) ctx.fillText(this.name, this.pos.x + 20, this.pos.y - 20);
+        const fontSize = 1 * game.scale * 70e8;
+        ctx.font = fontSize + "px Arial";
+        if(game.drawOnlyTarget && game.target != this) return;
+        ctx.fillText(this.name, canvas.width / 2 + this.pos.x * game.scale + this.r*game.scale + 5 + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - this.r*game.scale - 5 + game.yOffset);
     }
 }
 
@@ -168,8 +178,8 @@ class CelestialBody {
 ////////////////
 // FUNCTIONS //
 //////////////
-const createCelestialBody = (x, y, m, vx, vy, n, mCenter, color) => {
-    game.celestialBodyArr.push(new CelestialBody(x, y, m, vx, vy, n, mCenter, color));
+const createCelestialBody = (x, y, m, r, vx, vy, n, isImmovable, color) => {
+    game.celestialBodyArr.push(new CelestialBody(x, y, m, r, vx, vy, n, isImmovable, color));
     document.getElementById("bodySelect").innerHTML = "";
     for (let i = 0; i < game.celestialBodyArr.length; i++) document.getElementById("bodySelect").innerHTML += `<option value="${i}">${game.celestialBodyArr[i].name}</option>`;
 }
@@ -185,22 +195,20 @@ const setBody = () => {
     document.getElementById("massInput").value = "";
 }
 const createBody = () => {
-    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createmCenter").checked, document.getElementById("createColor").value);
+    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createisImmovable").checked, document.getElementById("createColor").value);
     document.getElementById("createX").value = "";
     document.getElementById("createY").value = "";
     document.getElementById("createM").value = "";
     document.getElementById("createVX").value = "";
     document.getElementById("createVY").value = "";
     document.getElementById("createName").value = "";
-    document.getElementById("createmCenter").checked = false;
+    document.getElementById("createisImmovable").checked = false;
     document.getElementById("createColor").value = "";
 }
 const deleteBody = () => {
     game.celestialBodyArr.splice(game.celestialBodyArr.indexOf(game.target), 1);
     document.getElementById("bodySelect").options.remove(document.getElementById("bodySelect").selectedIndex)
 }
-const startInterval = () => game.startInterval();
-const pauseInterval = () => game.pauseInterval();
 const writeHeader = (header, output) => {
     document.getElementById("title").innerHTML = "";
     let i = 0;
@@ -213,25 +221,27 @@ const writeHeader = (header, output) => {
         i++
     }, 300);
 }
-const getMousePos = (canvas, evt) => {
-    let rect = canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
 
-
+const aphelionDist = 152.10e9; //meter
+const aphelionSpeed = 29290; //m/s
+const earthMass = 5.972e24; //kg
+const earthRadius = 6.371e3 * game.radiusScale; //meter
+const sunRadius = 50e3 * game.radiusScale; //meter
+const sunMass = 1.9891e30; //kg
+const moonDistanceToEarth = 3844e5;
+const moonMass = 7.35e22; //kg
+const moonRadius = earthRadius / 7; //meter
+const moonRelativeSpeed = 970; //m/s
 ///////////////////
 // DECLARATIONS //
 /////////////////
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
-createCelestialBody(canvas.width / 2 - 100, canvas.height / 2, 50, 0, -3, 'A', false, 'white');
-createCelestialBody(canvas.width / 2 + 100, canvas.height / 2, 50, 0, 3, 'B', false, 'white');
-createCelestialBody(canvas.width / 2, canvas.height / 2 + 100, 50, -3, 0, 'C', false, 'white');
-createCelestialBody(canvas.width / 2, canvas.height / 2 - 100, 50, 3, 0, 'D', false, 'white');
-createCelestialBody(canvas.width / 2, canvas.height / 2, 100, 0, 0, 'Sola', true, 'yellow');
-game.startInterval();
+//createCelestialBody(aphelionDist, 0, earthMass, earthRadius, 0, aphelionSpeed, 'A', false, 'white');
+//createCelestialBody(-aphelionDist, 0, earthMass, earthRadius, 0, -aphelionSpeed, 'C', false, 'white');
+//createCelestialBody(0, aphelionDist, earthMass, earthRadius, -aphelionSpeed, 0, 'C', false, 'white');
+createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false, 'lime');
+createCelestialBody(0, -aphelionDist - moonDistanceToEarth, moonMass, moonRadius, moonRelativeSpeed + aphelionSpeed, 0, 'Månen', false, 'grey');
+createCelestialBody(0, 0, sunMass, sunRadius, 0, 0, 'Sola', false, 'yellow');
 game.drawInterval();
 
 
@@ -239,37 +249,66 @@ game.drawInterval();
 // EVENT LISTENERS //
 ////////////////////
 
-document.addEventListener("mousemove", (e) => {
-    let mousePos = getMousePos(canvas, e);
-    game.mouseX = mousePos.x;
-    game.mouseY = mousePos.y;
-    game.celestialBodyArr.forEach(body => {
-        if (game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
-            canvas.style.cursor = "pointer";
-        } else canvas.style.cursor = "auto";
-    });
+canvas.addEventListener("mousemove", e => {
+    if (game.isMousePressed) {
+        game.xOffset += e.clientX - game.xPrevious;
+        game.yOffset += e.clientY - game.yPrevious;
+
+        game.xPrevious = e.clientX;
+        game.yPrevious = e.clientY;
+    } else {
+        game.mouseX = e.clientX - game.xOffset;
+        game.mouseY = e.clientY - game.yOffset;
+
+
+        canvas.style.cursor = "auto";
+        game.celestialBodyArr.forEach(body => {
+            if (Math.sqrt(Math.pow(body.pos.x * game.scale - game.mouseX, 2) + Math.pow(body.pos.y * game.scale - game.mouseY, 2)) < body.r * game.scale) {
+                canvas.style.cursor = "pointer";
+            }
+
+            if (body.held) {
+                body.pos.x = game.mouseX/game.scale;
+                body.pos.y = game.mouseY/game.scale;
+            }
+        });
+    }
 });
 
-document.addEventListener("mousedown", () => {
+canvas.addEventListener("mousedown", e => {
+    //updating coordinates of last pressed location
+    game.isMousePressed = true;
+    game.xPrevious = e.clientX;
+    game.yPrevious = e.clientY;
+
+
     game.celestialBodyArr.forEach(body => {
-        if (game.mouseX < body.pos.x + body.r && game.mouseX > body.pos.x - body.r && game.mouseY < body.pos.y + body.r && game.mouseY > body.pos.y - body.r) {
+        if (Math.sqrt(Math.pow(body.pos.x * game.scale - game.mouseX, 2) + Math.pow(body.pos.y * game.scale - game.mouseY, 2)) < body.r * game.scale) {
+            //quickfix for at man ikke skal kunne dra canvas når man drar en planet
+            game.isMousePressed = false;
             game.target = body;
             body.held = true;
-            game.holdInterval = setInterval(() => {
-                if (body.held) {
-                    body.pos.x = game.mouseX;
-                    body.pos.y = game.mouseY;
-                }
-            }, 10);
         }
     });
 });
 
-document.addEventListener("mouseup", () => {
+canvas.addEventListener("mouseup", () => {
+    game.isMousePressed = false;
     game.celestialBodyArr.forEach(body => body.held = false);
     clearInterval(game.holdInterval);
 });
 
-document.getElementById("time").addEventListener("change", () => {
-    game.changeInterval();
+canvas.addEventListener("wheel", e => {
+    game.scale -= e.deltaY * game.scale/100;
+    if(game.scale < 0) game.scale = 0;
 })
+
+
+let prevTime = 0;
+function loop(time = 0){
+    game.deltaTime = time - prevTime;
+    prevTime = time;
+    if(!game.isPaused) game.update();
+    requestAnimationFrame(loop);
+}
+loop();

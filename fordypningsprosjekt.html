@@ -71,12 +71,12 @@
                 <br>
                 <label for="nameCheck">Draw Names:</label><input type="checkbox" id="nameCheck" class="optionInput" checked>
                 <br>
-                <label for="time">Speed:</label><input type="range" min="30" value="60" max="100" id="time" class="optionInput">
+                <label for="time">Speed:</label><input type="range" min="30" value="60" max="100" id="time" class="optionInput" ondragend="game.changeInerval()">
             </div>
             <br>
-            <button class="gButton" onclick="pauseInterval()">Pause</button>
+            <button class="gButton" onclick="game.pauseInterval()">Pause</button>
             <br>
-            <button class="gButton" onclick="startInterval()">Resume</button>
+            <button class="gButton" onclick="game.startInterval()">Resume</button>
         </div>
     </div>
 </body>
