@@ -18,6 +18,14 @@ let asteroidSpawnSpeed;
 let gameTime;
 
 
+const toRadians = d => Math.PI * d / 180;
+const rotate = (arr2, deg) => {
+    const d = toRadians(deg);
+    return [
+        arr2[0] * Math.cos(d) - arr2[1] * Math.sin(d),
+        arr2[0] * Math.sin(d) + arr2[1] * Math.cos(d)
+    ];
+}
 
 //////////////////////
 ///// VARIABLES /////
@@ -120,7 +128,6 @@ class Asteroid { //Sier seg selv
 //////////////////////
 ///// FUNCTIONS /////
 ////////////////////
-const toRadians = a => a * Math.PI / 180;
 const gameOver = time => { //Når spillet er over
     console.log("game over")
     ctx.fillStyle = 'white';
@@ -157,26 +164,25 @@ const startGame = () => { //Starter spillet
         edges: 3,
         score: 0,
         draw: () => {
-            spaceship.vertices = [];
-            for (let i = 1; i <= 3; i++) spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
-            let radians = spaceship.rotation * Math.PI / 180;
-            ctx.translate(spaceship.x, spaceship.y);
-            ctx.rotate(radians);
             ctx.beginPath();
-            ctx.moveTo(spaceship.size * Math.cos(0), spaceship.size * Math.sin(0));
-            for (let i = 1; i <= 3; i++) ctx.lineTo(spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges));
-            ctx.closePath();
+            ctx.moveTo(spaceship.x + spaceship.vertices[0][0], spaceship.y + spaceship.vertices[0][1]);
+            for (let i = 1; i < 3; i++)
+                ctx.lineTo(spaceship.x + spaceship.vertices[i][0], spaceship.y + spaceship.vertices[i][1]);
+
+            ctx.lineTo(spaceship.x + spaceship.vertices[0][0], spaceship.y + spaceship.vertices[0][1]);
+
             ctx.fillStyle = 'red';
             ctx.strokeStyle = "grey";
             ctx.lineWidth = 2;
             ctx.stroke();
             ctx.fill();
-            ctx.rotate(-radians);
-            ctx.translate(-spaceship.x, -spaceship.y);
+            ctx.closePath();
         },
         shoot: () => spaceship.projectiles.push(new Projectile(spaceship.directionX, spaceship.directionY, spaceship.x, spaceship.y)),
     }
 
+    spaceship.vertices = [];
+    for (let i = 1; i <= 3; i++) spaceship.vertices.push([spaceship.size * Math.cos(i * 2 * Math.PI / spaceship.edges), spaceship.size * Math.sin(i * 2 * Math.PI / spaceship.edges)]);
     //Setter variabler til startverdier ved new game
     asteroidInterval = 3000;
     asteroids = new Array;
@@ -184,14 +190,25 @@ const startGame = () => { //Starter spillet
     spaceship.draw();
     time = 0;
 
+
+
     //Setter intervaller
     update = setInterval(() => { //Updatefunksjonen som runner hele spillet
 
         //Clearer canvas og begynner å drawe
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (spaceship.left) spaceship.rotation += -3; //Roterer 2 grader venstre
-        if (spaceship.right) spaceship.rotation += 3; //Roterer 2 grader høyre
+        if (spaceship.left) {
+            console.log("før", spaceship.vertices[0]);
+            spaceship.rotation += -3; //Roterer 2 grader venstre
+            for (let i = 0; i < spaceship.edges; i++) spaceship.vertices[i] = rotate(spaceship.vertices[i], -3);
+
+            console.log("etter",spaceship.vertices[0]);
+        }
+        if (spaceship.right) {
+            spaceship.rotation += 3; //Roterer 2 grader høyre
+            for (let i = 0; i < spaceship.edges; i++) spaceship.vertices[i] = rotate(spaceship.vertices[i], 3);
+        }
 
         //Sørger for at gradene alltid er mellom 0-360
         if (spaceship.rotation > 360) spaceship.rotation = 0;

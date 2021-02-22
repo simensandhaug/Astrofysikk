@@ -4,6 +4,29 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const fpsDiv = document.getElementById("fps");
+const bodySelect = document.getElementById("bodySelect");
+
+/////////////
+// IMAGES //
+///////////
+const getImage = string =>{
+    let image = new Image();
+    let src;
+    if(string.toLowerCase() == "mars") src = "mars.png.png";
+    else if(string.toLowerCase() == "venus") src = "venus.png.png";
+    else if(string.toLowerCase() == "jorda") src = "earth.png.png";
+    else if(string.toLowerCase() == "sola") src = "sun.png";
+    else if(string.toLowerCase() == "merkur") src = "mercury.png.png";
+    else if(string.toLowerCase() == "neptun") src = "neptune.png.png";
+    else if(string.toLowerCase() == "saturn") src = "saturn.png.png";
+    else if(string.toLowerCase() == "uranus") src = "uranus.png.png";
+    else if(string.toLowerCase() == "jupiter") src = "jupiter.png.png";
+    else src = "standard-planet.png";
+
+    image.src = "../images/" + src;
+    console.log(image.width, image.height)
+    return image;
+}
 
 //////////////
 // CLASSES //
@@ -16,7 +39,7 @@ class Game {
         this.g = 6.67408e-11;
         this.celestialBodyArr = [];
         this.gameInterval;
-        this.drawingInterval;
+        this.drawingInterval = 10;
         this.drawOnlyTarget;
         this.mouseX = 0;
         this.mouseY = 0;
@@ -27,17 +50,11 @@ class Game {
         this.xPrevious;
         this.yPrevious;
         this.scale = 10 / 70e8;
-        this.radiusScale = 100000;
+        this.radiusScale = 1;
+        this.vectorScale = 1000 * this.radiusScale;
     }
 
     update = () => {
-        this.target = this.celestialBodyArr[document.getElementById("bodySelect").selectedIndex];
-        if (this.target) {
-            document.getElementById("targetMass").innerHTML = `Target Mass: ${this.target.mass}`;
-            document.getElementById("targetRadius").innerHTML = `Target Radius: ${this.target.r.toFixed(2)}`;
-            document.getElementById("targetPos").innerHTML = `x:${this.target.pos.x.toFixed(2)}, y: ${this.target.pos.y.toFixed(2)}`;
-            document.getElementById("targetVelocity").innerHTML = `xv:${this.target.vel.x.toFixed(2)}, yv: ${this.target.vel.y.toFixed(2)}`;
-        }
         this.celestialBodyArr.forEach(body => body.update());
     }
     draw = () => this.celestialBodyArr.forEach(body => body.draw());
@@ -47,22 +64,11 @@ class Game {
     changeSpeed = () => {
         this.speed = parseFloat(document.getElementById("time").value);
     }
-    pauseInterval = () =>{
+    pauseInterval = () => {
         this.isPaused = true;
     }
-    startInterval = () =>{
+    startInterval = () => {
         this.isPaused = false;
-    }
-    drawInterval = () => {
-        clearInterval(this.drawingInterval);
-        this.drawingInterval = setInterval(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            this.draw();
-            if (document.getElementById("vectorCheck").checked) this.drawVectors();
-            if (document.getElementById("orbitCheck").checked) this.drawOrbits();
-            if (document.getElementById("nameCheck").checked) this.drawNames();
-            this.drawOnlyTarget = document.getElementById("onlyTargetCheck").checked;
-        }, this.interval);
     }
 }
 let game = new Game();
@@ -94,6 +100,7 @@ class CelestialBody {
         this.held = false;
         this.isImmovable = isImmovable;
         this.color = color;
+        this.sprite = getImage(this.name);
     }
     computeAcceleration = () => {
         let acc = new Vector(0, 0);
@@ -102,9 +109,9 @@ class CelestialBody {
             if (body == this) return;
             let delta = body.pos.sub(this.pos);
 
-            let strength = game.g * this.mass * body.mass / Math.pow(delta.mag(), 2);
+            let strength = game.g * body.mass / Math.pow(delta.mag(), 2);
 
-            delta.setMag(strength/this.mass);
+            delta.setMag(strength);
             acc = acc.add(delta);
         });
 
@@ -117,52 +124,34 @@ class CelestialBody {
         this.pos = this.pos.add(this.vel.mul(game.speed * game.deltaTime));
 
         this.trail.push(this.pos);
-        if (this.trail.length > 250) this.trail.shift();
+        if (this.trail.length > 2000) this.trail.shift();
     }
     draw = () => {
-        ctx.fillStyle = this == game.target ? 'red' : this.color;
-        ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.arc(this.pos.x * game.scale + game.xOffset + canvas.width / 2, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset, this.r * game.scale, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.drawImage(this.sprite, 0, 0, this.sprite.width, this.sprite.height, toCanvasX(this.pos.x - this.r), toCanvasY(this.pos.y + this.r), this.r * game.scale * 2, this.r * game.scale * 2);
         ctx.closePath();
     }
     drawVector = () => {
-        ctx.strokeStyle = this == game.target ? 'red' : 'white';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = this.r * game.scale * 0.008;
+        if (game.drawOnlyTarget && game.target != this) return;
         ctx.beginPath();
-        if (game.drawOnlyTarget && game.target == this) {
-            ctx.moveTo(canvas.width / 2 + this.pos.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset);
-            ctx.lineTo(canvas.width / 2 + this.pos.x * game.scale + game.radiusScale*this.vel.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - game.radiusScale* this.vel.y * game.scale + game.yOffset);
-            ctx.stroke();
-        }
-        if (!game.drawOnlyTarget) {
-            ctx.moveTo(canvas.width / 2 + this.pos.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) + game.yOffset);
-            ctx.lineTo(canvas.width / 2 + this.pos.x * game.scale + game.radiusScale*this.vel.x * game.scale + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - game.radiusScale*this.vel.y * game.scale + game.yOffset);
-            ctx.stroke();
-        }
+        ctx.moveTo(toCanvasX(this.pos.x), toCanvasY(this.pos.y));
+        ctx.lineTo(toCanvasX(this.pos.x + this.vel.x * game.vectorScale), toCanvasY(this.pos.y + this.vel.y * game.vectorScale));
+        ctx.stroke();
         ctx.closePath();
     }
     drawOrbit = () => {
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2.5;
         if (!this.isImmovable) {
-            ctx.strokeStyle = 'blue';
-            if (game.drawOnlyTarget && game.target == this) {
-                for (let i = 1; i < this.trail.length; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(canvas.width / 2 + this.trail[i - 1].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i - 1].y * game.scale) + game.yOffset);
-                    ctx.lineTo(canvas.width / 2 + this.trail[i].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i].y * game.scale) + game.yOffset);
-                    ctx.stroke();
-                    ctx.closePath();
-                }
-            }
-            if (!game.drawOnlyTarget) {
-                for (let i = 1; i < this.trail.length; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(canvas.width / 2 + this.trail[i - 1].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i - 1].y * game.scale) + game.yOffset);
-                    ctx.lineTo(canvas.width / 2 + this.trail[i].x * game.scale + game.xOffset, canvas.height / 2 - (this.trail[i].y * game.scale) + game.yOffset);
-                    ctx.stroke();
-                    ctx.closePath();
-                }
+            if (game.drawOnlyTarget && game.target != this) return;
+            for (let i = 1; i < this.trail.length; i++) {
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(this.trail[i - 1].x), toCanvasY(this.trail[i - 1].y));
+                ctx.lineTo(toCanvasX(this.trail[i].x), toCanvasY(this.trail[i].y));
+                ctx.stroke();
+                ctx.closePath();
             }
         }
     }
@@ -170,8 +159,8 @@ class CelestialBody {
         ctx.fillStyle = 'white';
         const fontSize = 1 * game.scale * 70e8;
         ctx.font = fontSize + "px Arial";
-        if(game.drawOnlyTarget && game.target != this) return;
-        ctx.fillText(this.name, canvas.width / 2 + this.pos.x * game.scale + this.r*game.scale + 5 + game.xOffset, canvas.height / 2 - (this.pos.y * game.scale) - this.r*game.scale - 5 + game.yOffset);
+        if (game.drawOnlyTarget && game.target != this) return;
+        ctx.fillText(this.name, toCanvasX(this.pos.x + this.r) + 5, toCanvasY(this.pos.y + this.r) - 5);
     }
 }
 
@@ -222,28 +211,55 @@ const writeHeader = (header, output) => {
         i++
     }, 300);
 }
+const toCanvasX = x => (x - game.target.pos.x) * game.scale + canvas.width / 2 + game.xOffset;
+const toCanvasY = y => -(y - game.target.pos.y) * game.scale + canvas.height / 2 + game.yOffset;
+const fromCanvasX = x => (x - canvas.width / 2 - game.xOffset) / game.scale + game.target.pos.x;
+const fromCanvasY = y => (y - canvas.height / 2 - game.yOffset) / -game.scale + game.target.pos.y;
+
+
 
 const aphelionDist = 152.10e9; //meter
 const aphelionSpeed = 29290; //m/s
-const earthMass = 5.972e24; //kg
-const earthRadius = 6.371e3 * game.radiusScale; //meter
-const sunRadius = 50e3 * game.radiusScale; //meter
+const earthMass = 5.972e24 * 2; //kg
+const earthRadius = 6.371e6 * game.radiusScale //meter
+const sunRadius = 696340e3 * game.radiusScale; //meter
 const sunMass = 1.9891e30; //kg
 const moonDistanceToEarth = 3844e5;
-const moonMass = 7.35e22; //kg
-const moonRadius = earthRadius / 7; //meter
+const moonMass = 7.34767309e22; //kg
+const moonRadius = earthRadius / 7 * game.radiusScale; //meter
 const moonRelativeSpeed = 970; //m/s
+const marsMass = 6.39e23 //kg
+const marsDist = 227.94e9 //meter
+const marsRadius = 3389.5e3 * game.radiusScale //meter
+const marsSpeed = 24e3 //m/s
+const mercuryMass = 3.285E23 //kg
+const mercuryDist = 58e9 //meter
+const mercuryRadius = 2.4397e4 * game.radiusScale //meter
+const mercurySpeed = 47e3 //m/s
+const venusMass = 4.867E24 //kg
+const venusDist = 108e9 //meter
+const venusRadius = 60518e2 * game.radiusScale //meter
+const venusSpeed = 35.02e3 //m/s
+const jupiterMass = 1.898E27 //kg
+const jupiterDist = 778e9 //meter
+const jupiterRadius = 69911e3 * game.radiusScale //meter
+const jupiterSpeed = 13.07e3 //m/s
+const saturnMass = 5.683e26 //kg
+const saturnDist = 1.4e12 //meter
+const saturnRadius = 58232e3 * game.radiusScale //meter
+const saturnSpeed = 9.68e3 //m/s 
 ///////////////////
 // DECLARATIONS //
 /////////////////
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
-//createCelestialBody(aphelionDist, 0, earthMass, earthRadius, 0, aphelionSpeed, 'A', false, 'white');
-//createCelestialBody(-aphelionDist, 0, earthMass, earthRadius, 0, -aphelionSpeed, 'C', false, 'white');
-//createCelestialBody(0, aphelionDist, earthMass, earthRadius, -aphelionSpeed, 0, 'C', false, 'white');
-createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false, 'lime');
-createCelestialBody(0, -aphelionDist - moonDistanceToEarth, moonMass, moonRadius, moonRelativeSpeed + aphelionSpeed, 0, 'Beta Planet', false, 'grey');
 createCelestialBody(0, 0, sunMass, sunRadius, 0, 0, 'Sola', false, 'yellow');
-game.drawInterval();
+createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false, 'lime');
+createCelestialBody(0, -mercuryDist, mercuryMass, mercuryRadius, mercurySpeed, 0, 'Merkur', false, 'grey');
+createCelestialBody(0, -venusDist, venusMass, venusRadius, venusSpeed, 0, 'Venus', false, 'white');
+createCelestialBody(0, -marsDist, marsMass, marsRadius, marsSpeed, 0, 'Mars', false, 'orange');
+createCelestialBody(0, -jupiterDist, jupiterMass, jupiterRadius, jupiterSpeed, 0, 'Jupiter', false, '#ffffff');
+createCelestialBody(0, -saturnDist, saturnMass, saturnRadius, saturnSpeed, 0, 'Saturn', false, '#ffffff');
+game.target = game.celestialBodyArr[0];
 
 
 //////////////////////
@@ -252,25 +268,24 @@ game.drawInterval();
 
 canvas.addEventListener("mousemove", e => {
     if (game.isMousePressed) {
-        game.xOffset += e.clientX - game.xPrevious;
-        game.yOffset += e.clientY - game.yPrevious;
+        game.xOffset += e.offsetX - game.xPrevious;
+        game.yOffset += e.offsetY - game.yPrevious;
 
-        game.xPrevious = e.clientX;
-        game.yPrevious = e.clientY;
+        game.xPrevious = e.offsetX;
+        game.yPrevious = e.offsetY;
     } else {
-        game.mouseX = e.clientX - game.xOffset;
-        game.mouseY = e.clientY - game.yOffset;
-
+        game.mouseX = fromCanvasX(e.offsetX);
+        game.mouseY = fromCanvasY(e.offsetY);
 
         canvas.style.cursor = "auto";
         game.celestialBodyArr.forEach(body => {
-            if (Math.sqrt(Math.pow(body.pos.x * game.scale - game.mouseX, 2) + Math.pow(body.pos.y * game.scale - game.mouseY, 2)) < body.r * game.scale) {
+            if (Math.sqrt(Math.pow(body.pos.x - game.mouseX, 2) + Math.pow(body.pos.y - game.mouseY, 2)) < body.r) {
                 canvas.style.cursor = "pointer";
             }
 
             if (body.held) {
-                body.pos.x = game.mouseX/game.scale;
-                body.pos.y = game.mouseY/game.scale;
+                body.pos.x = game.mouseX;
+                body.pos.y = game.mouseY;
             }
         });
     }
@@ -279,15 +294,14 @@ canvas.addEventListener("mousemove", e => {
 canvas.addEventListener("mousedown", e => {
     //updating coordinates of last pressed location
     game.isMousePressed = true;
-    game.xPrevious = e.clientX;
-    game.yPrevious = e.clientY;
+    game.xPrevious = e.offsetX;
+    game.yPrevious = e.offsetY;
 
 
     game.celestialBodyArr.forEach(body => {
-        if (Math.sqrt(Math.pow(body.pos.x * game.scale - game.mouseX, 2) + Math.pow(body.pos.y * game.scale - game.mouseY, 2)) < body.r * game.scale) {
+        if (Math.sqrt(Math.pow(body.pos.x - fromCanvasX(e.offsetX), 2) + Math.pow(body.pos.y - fromCanvasY(e.offsetY), 2)) < body.r) {
             //quickfix for at man ikke skal kunne dra canvas når man drar en planet
             game.isMousePressed = false;
-            game.target = body;
             body.held = true;
         }
     });
@@ -300,17 +314,42 @@ canvas.addEventListener("mouseup", () => {
 });
 
 canvas.addEventListener("wheel", e => {
-    game.scale -= e.deltaY * game.scale/100;
-    if(game.scale < 0) game.scale = 0;
+    game.scale -= e.deltaY * game.scale / 100;
+    if (game.scale < 1e-10) game.scale = 1e-10;
 })
 
+//update target
+bodySelect.addEventListener("change", () => {
+    game.target = game.celestialBodyArr[bodySelect.selectedIndex];
+    game.xOffset = 0;
+    game.yOffset = 0;
+});
 
 let prevTime = 0;
-function loop(time = 0){
+
+function loop(time = 0) {
     game.deltaTime = time - prevTime;
-    fpsDiv.innerHTML = "FPS: " + Math.round(1 /(game.deltaTime / 1000));
+    fpsDiv.innerHTML = "FPS: " + Math.round(1 / (game.deltaTime / 1000));
     prevTime = time;
-    if(!game.isPaused) game.update();
+    if (!game.isPaused) game.update();
+
+
+    //tar hånd om target display
+    if (game.target) {
+
+        document.getElementById("targetMass").innerHTML = `Target Mass: ${game.target.mass}`;
+        document.getElementById("targetRadius").innerHTML = `Target Radius: ${game.target.r.toExponential(2)}`;
+        document.getElementById("targetPos").innerHTML = `x:${game.target.pos.x.toExponential(2)}, y: ${game.target.pos.y.toExponential(2)}`;
+        document.getElementById("targetVelocity").innerHTML = `Velocity:${game.target.vel.mag().toExponential(2)}`;
+    }
+
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    game.draw();
+    if (document.getElementById("vectorCheck").checked) game.drawVectors();
+    if (document.getElementById("orbitCheck").checked) game.drawOrbits();
+    if (document.getElementById("nameCheck").checked) game.drawNames();
+    game.drawOnlyTarget = document.getElementById("onlyTargetCheck").checked;
     requestAnimationFrame(loop);
 }
 loop();
