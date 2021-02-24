@@ -151,7 +151,7 @@ const startGame = () => { //Starter spillet
         x: canvas.width / 2,
         y: canvas.height / 2,
         size: 15,
-        rotation: 270,
+        rotation: 0,
         dx: 0,
         dy: 0,
         aX: 0,

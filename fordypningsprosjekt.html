@@ -14,7 +14,7 @@
 
 <body>
     <div class="container">
-        <h1 id="title">Gravitasjon</h1>
+        <h1 id="title">Solsystem</h1>
         <img class="arrowBack" src="images/arrowback.png" alt="Tilbake til hovedmeny" width="50px" height="50px"
             onclick=location.href='index.html'>
         <canvas id="canvas" width="1600px" height="800px">
@@ -22,9 +22,10 @@
         </canvas>
         <div id="info">
             <p id="fps" class="infoP"></p>
-            <p id="targetMass" class="infoP">Target Mass:</p>
+            <p id="targetMass" class="infoP"></p>
             <p id="targetRadius" class="infoP"></p>
-            <p id="targetPos" class="infoP"></p>
+            <p id="targetPosX" class="infoP"></p>
+            <p id="targetPosY" class="infoP"></p>
             <p id="targetVelocity" class="infoP"></p>
         </div>
         <div id="options">
@@ -41,24 +42,26 @@
             <br>
             <label for="yInput">y: </label><input class="optionInput" type="number" id="yInput">
             <br>
+            <label for="radiusInput">Radius: </label><input class="optionInput" type="number" id="radiusInput">
+            <br>
             <button class="gButton" onclick="setBody()">Set</button>
             <br>
             <button class="gButton" onclick="deleteBody()">Delete</button>
             <div id="lineBreak"></div>
             <p class="optionHeader">Create new body</p>
-            <label for="createX">x:</label><input type="number" min="0" id="createX" class="optionInput"> <br>
-            <label for="createY">y:</label><input type="number" min="0" id="createY" class="optionInput"> <br>
-            <label for="createM">Mass:</label><input type="number" min="0" max="250" id="createM" class="optionInput">
+            <label for="createX">x:</label><input type="number" id="createX" class="optionInput"> <br>
+            <label for="createY">y:</label><input type="number" id="createY" class="optionInput"> <br>
+            <label for="createM">Mass:</label><input type="number" id="createM" class="optionInput">
             <br>
-            <label for="createVX">Velocity-x:</label><input type="number" min="0" max="10" id="createVX"
+            <label for="createR">Radius:</label><input type="number" id="createR" class="optionInput">
+            <br>
+            <label for="createVX">Velocity-x:</label><input type="number" id="createVX"
                 class="optionInput"> <br>
-            <label for="createVY">Velocity-y:</label><input type="number" min="0" max="10" id="createVY"
+            <label for="createVY">Velocity-y:</label><input type="number" id="createVY"
                 class="optionInput"> <br>
             <label for="createName">Name:</label><input type="text" id="createName" class="optionInput" maxlength="8">
             <br>
-            <label for="createColor">Hex:</label><input type="text" id="createColor" class="optionInput" max="7">
-            <br>
-            <label for="createmCenter">Immovable:</label><input type="checkbox" id="createmCenter" class="optionInput">
+            <label for="createisImmovable">Immovable:</label><input type="checkbox" id="createisImmovable" class="optionInput">
             <br>
             <button class="gButton" onclick="createBody()">Create</button>
             <div id="lineBreak"></div>

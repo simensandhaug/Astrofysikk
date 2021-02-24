@@ -24,7 +24,6 @@ const getImage = string =>{
     else src = "standard-planet.png";
 
     image.src = "../images/" + src;
-    console.log(image.width, image.height)
     return image;
 }
 
@@ -54,22 +53,14 @@ class Game {
         this.vectorScale = 1000 * this.radiusScale;
     }
 
-    update = () => {
-        this.celestialBodyArr.forEach(body => body.update());
-    }
+    update = () => this.celestialBodyArr.forEach(body => body.update());
     draw = () => this.celestialBodyArr.forEach(body => body.draw());
     drawVectors = () => this.celestialBodyArr.forEach(body => body.drawVector());
     drawOrbits = () => this.celestialBodyArr.forEach(body => body.drawOrbit());
     drawNames = () => this.celestialBodyArr.forEach(body => body.drawName());
-    changeSpeed = () => {
-        this.speed = parseFloat(document.getElementById("time").value);
-    }
-    pauseInterval = () => {
-        this.isPaused = true;
-    }
-    startInterval = () => {
-        this.isPaused = false;
-    }
+    changeSpeed = () => this.speed = parseFloat(document.getElementById("time").value);
+    pauseInterval = () => this.isPaused = true;
+    startInterval = () => this.isPaused = false;
 }
 let game = new Game();
 class Vector {
@@ -89,7 +80,7 @@ class Vector {
     }
 }
 class CelestialBody {
-    constructor(x, y, mass, radius, vx, vy, name, isImmovable, color) {
+    constructor(x, y, mass, radius, vx, vy, name, isImmovable) {
         this.pos = new Vector(x, y);
         this.vel = new Vector(vx, vy);
         this.acc = new Vector(0, 0);
@@ -99,14 +90,17 @@ class CelestialBody {
         this.name = name;
         this.held = false;
         this.isImmovable = isImmovable;
-        this.color = color;
         this.sprite = getImage(this.name);
     }
     computeAcceleration = () => {
         let acc = new Vector(0, 0);
-        if (this.isImmovable) return acc;
+        if (this.isImmovable) {
+            return acc;
+        }
         game.celestialBodyArr.forEach(body => {
-            if (body == this) return;
+            if (body == this) {
+                return;
+            }
             let delta = body.pos.sub(this.pos);
 
             let strength = game.g * body.mass / Math.pow(delta.mag(), 2);
@@ -123,8 +117,11 @@ class CelestialBody {
         this.vel = this.vel.add(this.acc.mul(game.speed * game.deltaTime));
         this.pos = this.pos.add(this.vel.mul(game.speed * game.deltaTime));
 
+
         this.trail.push(this.pos);
-        if (this.trail.length > 2000) this.trail.shift();
+        if (this.trail.length > 2000) {
+            this.trail.shift();
+        }
     }
     draw = () => {
         ctx.beginPath();
@@ -168,8 +165,8 @@ class CelestialBody {
 ////////////////
 // FUNCTIONS //
 //////////////
-const createCelestialBody = (x, y, m, r, vx, vy, n, isImmovable, color) => {
-    game.celestialBodyArr.push(new CelestialBody(x, y, m, r, vx, vy, n, isImmovable, color));
+const createCelestialBody = (x, y, m, r, vx, vy, n, isImmovable) => {
+    game.celestialBodyArr.push(new CelestialBody(x, y, m, r, vx, vy, n, isImmovable));
     document.getElementById("bodySelect").innerHTML = "";
     for (let i = 0; i < game.celestialBodyArr.length; i++) document.getElementById("bodySelect").innerHTML += `<option value="${i}">${game.celestialBodyArr[i].name}</option>`;
 }
@@ -177,23 +174,26 @@ const setBody = () => {
     let x = document.getElementById("xInput").value;
     let y = document.getElementById("yInput").value;
     let m = document.getElementById("massInput").value;
+    let r = document.getElementById("radiusInput").value;
     if (!m == "") game.target.mass = parseFloat(m);
     if (!x == "") game.target.pos.x = parseFloat(x);
     if (!y == "") game.target.pos.y = parseFloat(y);
+    if (!r == "") game.target.pos.r = parseFloat(r);
     document.getElementById("xInput").value = "";
     document.getElementById("yInput").value = "";
     document.getElementById("massInput").value = "";
+    document.getElementById("radiusInput").value = "";
 }
 const createBody = () => {
-    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createisImmovable").checked, document.getElementById("createColor").value);
+    createCelestialBody(parseFloat(document.getElementById("createX").value), parseFloat(document.getElementById("createY").value), parseFloat(document.getElementById("createM").value), parseFloat(document.getElementById("createR").value) ,parseFloat(document.getElementById("createVX").value), parseFloat(document.getElementById("createVY").value), document.getElementById("createName").value, document.getElementById("createisImmovable").checked);
     document.getElementById("createX").value = "";
     document.getElementById("createY").value = "";
     document.getElementById("createM").value = "";
+    document.getElementById("createR").value = "";
     document.getElementById("createVX").value = "";
     document.getElementById("createVY").value = "";
     document.getElementById("createName").value = "";
     document.getElementById("createisImmovable").checked = false;
-    document.getElementById("createColor").value = "";
 }
 const deleteBody = () => {
     game.celestialBodyArr.splice(game.celestialBodyArr.indexOf(game.target), 1);
@@ -248,17 +248,27 @@ const saturnMass = 5.683e26 //kg
 const saturnDist = 1.4e12 //meter
 const saturnRadius = 58232e3 * game.radiusScale //meter
 const saturnSpeed = 9.68e3 //m/s 
+const uranusMass = 8.681e25 //kg
+const uranusDist = 2.9e12 //meter
+const uranusRadius = 25.362e6 * game.radiusScale //meter
+const uranusSpeed = 6.83527778e3 //m/s
+const neptuneMass = 1.024e26 //kg
+const neptuneDist = 4.4758e12 //meter
+const neptuneRadius = 24.622e6 * game.radiusScale //meter
+const neptuneSpeed = 5430 //m/s
 ///////////////////
 // DECLARATIONS //
 /////////////////
 writeHeader(document.getElementById("title").innerHTML, document.getElementById("title"));
 createCelestialBody(0, 0, sunMass, sunRadius, 0, 0, 'Sola', false, 'yellow');
-createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false, 'lime');
-createCelestialBody(0, -mercuryDist, mercuryMass, mercuryRadius, mercurySpeed, 0, 'Merkur', false, 'grey');
-createCelestialBody(0, -venusDist, venusMass, venusRadius, venusSpeed, 0, 'Venus', false, 'white');
+createCelestialBody(0, -aphelionDist, earthMass, earthRadius, aphelionSpeed, 0, 'Jorda', false);
+createCelestialBody(0, -mercuryDist, mercuryMass, mercuryRadius, mercurySpeed, 0, 'Merkur', false);
+createCelestialBody(0, -venusDist, venusMass, venusRadius, venusSpeed, 0, 'Venus', false);
 createCelestialBody(0, -marsDist, marsMass, marsRadius, marsSpeed, 0, 'Mars', false, 'orange');
-createCelestialBody(0, -jupiterDist, jupiterMass, jupiterRadius, jupiterSpeed, 0, 'Jupiter', false, '#ffffff');
-createCelestialBody(0, -saturnDist, saturnMass, saturnRadius, saturnSpeed, 0, 'Saturn', false, '#ffffff');
+createCelestialBody(0, -jupiterDist, jupiterMass, jupiterRadius, jupiterSpeed, 0, 'Jupiter', false);
+createCelestialBody(0, -saturnDist, saturnMass, saturnRadius, saturnSpeed, 0, 'Saturn', false);
+createCelestialBody(0, -uranusDist, uranusMass, uranusRadius, uranusSpeed, 0, 'Uranus', false);
+createCelestialBody(0, -neptuneDist, neptuneMass, neptuneRadius, neptuneSpeed, 0, 'Neptun', false);
 game.target = game.celestialBodyArr[0];
 
 
@@ -315,7 +325,9 @@ canvas.addEventListener("mouseup", () => {
 
 canvas.addEventListener("wheel", e => {
     game.scale -= e.deltaY * game.scale / 100;
-    if (game.scale < 1e-10) game.scale = 1e-10;
+    if (game.scale < 1e-10) {
+        game.scale = 1e-10;
+    }
 })
 
 //update target
@@ -327,28 +339,36 @@ bodySelect.addEventListener("change", () => {
 
 let prevTime = 0;
 
-function loop(time = 0) {
+const loop = (time = 0) => {
     game.deltaTime = time - prevTime;
     fpsDiv.innerHTML = "FPS: " + Math.round(1 / (game.deltaTime / 1000));
     prevTime = time;
-    if (!game.isPaused) game.update();
+    if (!game.isPaused) {
+        game.update();
+    }
 
 
     //tar hånd om target display
     if (game.target) {
-
-        document.getElementById("targetMass").innerHTML = `Target Mass: ${game.target.mass}`;
-        document.getElementById("targetRadius").innerHTML = `Target Radius: ${game.target.r.toExponential(2)}`;
-        document.getElementById("targetPos").innerHTML = `x:${game.target.pos.x.toExponential(2)}, y: ${game.target.pos.y.toExponential(2)}`;
-        document.getElementById("targetVelocity").innerHTML = `Velocity:${game.target.vel.mag().toExponential(2)}`;
+        document.getElementById("targetMass").innerHTML = `Target Mass: ${game.target.mass} kg`;
+        document.getElementById("targetRadius").innerHTML = `Target Radius: ${game.target.r.toExponential(2)} meters`;
+        document.getElementById("targetPosX").innerHTML = `x: ${game.target.pos.x.toExponential(2)} meters`;
+        document.getElementById("targetPosY").innerHTML = `y: ${game.target.pos.y.toExponential(2)} meters`;
+        document.getElementById("targetVelocity").innerHTML = `Absolute velocity: ${game.target.vel.mag().toExponential(2)} m/s`;
     }
 
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     game.draw();
-    if (document.getElementById("vectorCheck").checked) game.drawVectors();
-    if (document.getElementById("orbitCheck").checked) game.drawOrbits();
-    if (document.getElementById("nameCheck").checked) game.drawNames();
+    if (document.getElementById("vectorCheck").checked) {
+        game.drawVectors();
+    }
+    if (document.getElementById("orbitCheck").checked) {
+        game.drawOrbits();
+    }
+    if (document.getElementById("nameCheck").checked) {
+        game.drawNames();
+    }
     game.drawOnlyTarget = document.getElementById("onlyTargetCheck").checked;
     requestAnimationFrame(loop);
 }

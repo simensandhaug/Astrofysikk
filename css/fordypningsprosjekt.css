@@ -31,10 +31,9 @@
 
 #info {
     background-color: rgba(49, 49, 49, 0.3);
-    display: inline;
-    text-align: center;
+    text-align: left;
     position: absolute;
-    width: 40%;
+    width: 82.6%;
     height: 30px;
     top: 10.5%;
     padding: 5px;
