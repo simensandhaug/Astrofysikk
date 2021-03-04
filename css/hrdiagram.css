@@ -1,7 +1,9 @@
 #canvas {
-    background-image: url('../images/hr-diagram.png');
+    background-color: white;
+    background-image: url("../images/hr-diagram.png");
     background-repeat: no-repeat;
-    background-size: contain;
+    background-position-x: center;
+    background-position-y: center;
 }
 
 .flex-container {
@@ -28,7 +30,7 @@
 }
 
 p {
-    margin-left: 25px;
+    margin: 25px;
 }
 
 #buttonDiv {

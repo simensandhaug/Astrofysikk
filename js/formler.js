@@ -55,6 +55,16 @@ const calculate = name => {
             if (inputs[1].value == "" || inputs[1].value == "0") {
                 outputValue = `r = ${(inputs[0].value/21.7).toExponential(2).replace(/e\+?/, ' ⋅ 10^')} m`;
             }
+            case 'Luminositet / Utstrålt effekt':
+                if (inputs[0].value == "" || inputs[0].value == "0") {
+                    outputValue = `L = ${parseFloat(((4 * Math.PI * (5.67*Math.pow(10, -8))*Math.pow(parseFloat(inputs[1].value), 4))) * Math.pow(parseFloat(inputs[2].value), 2)).toExponential(2).replace(/e\+?/, ' ⋅ 10^')} W`;
+                }
+                if (inputs[1].value == "" || inputs[1].value == "0") {
+                    outputValue = `T = ${(Math.pow(inputs[0].value) / (5.67*Math.pow(10, -8) * 4 * Math.PI * Math.pow(parseFloat(inputs[2]).value, 2), 1/4).toExponential(2).replace(/e\+?/, ' ⋅ 10^'), (1/4))} K`;
+                }
+                if (inputs[2].value == "" || inputs[2].value == "0") {
+                    outputValue = `R = ${(Math.pow(parseFloat(inputs[0].value) / (4 * Math.PI * (5.67*Math.pow(10, -8)) * (Math.pow(parseFloat(inputs[1].value)), 4))), 1/2).toExponential(2).replace(/e\+?/, ' ⋅ 10^')} m`;
+                }
     }
     let i = 0;
 
@@ -108,6 +118,13 @@ const loadPage = () => {
         inputs: ['v', 'r'],
         units: ['v = m/s', 'H = (km/s) / 10<sup>6</sup> l.y', 'r = m'],
         info: 'Galakser har en radialfart som er større jo større avstanden er fra jorda. H er Hubbles konstant og blir bestemt med stadig større nøyaktighet.',
+    }, {
+        name: 'Luminositet / Utstrålt effekt',
+        equation: `L = 4πσT<sup>4</sup>R<sup>2</sup>`,
+        variableMeanings: ['L = Luminositet', 'σ = Konstant(5.67 ⋅ 10<sup>-8</sup>)', 'T = Temperatur', 'R = Radius til stjernen'],
+        inputs: ['L', 'T', 'R'],
+        units: ['L = W', 'σ = W/m<sup>2</sup>K<sup>4</sup>', 'T = K', 'R = m'],
+        info: 'Det er en direkte sammenheng mellom en stjernes luminositet, temperatur og radius',
     }, ]
     contentContainer.innerHTML = `<img class="arrowBack" src="images/arrowback.png" alt="Tilbake til hovedmeny"  width="50px" height="50px" onclick=location.href='index.html'>`
     contentContainer.innerHTML += `<h1 id="title"></h1>`;
