@@ -31,6 +31,7 @@ const slideInfo = [{
 
 const drawContentForSlide = (counter) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillText(`Side ${counter + 1} av 5`, 10, canvas.height - 10);
     switch (counter) {
         case 1:
             ctx.beginPath();
@@ -84,3 +85,5 @@ ctx.strokeStyle = 'red';
 ctx.lineWidth = 2;
 ctx.fillStyle = 'black';
 ctx.font = '15px Arial';
+
+ctx.fillText(`Side 1 av 5`, 10, canvas.height - 10);
